@@ -1,0 +1,4 @@
+# Preface {.unnumbered}
+
+This is a R implementation of examples in "Time Series Analysis and Application" by Chi-Hyuck Jun.
+

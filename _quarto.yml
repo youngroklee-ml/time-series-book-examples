@@ -1,0 +1,19 @@
+project:
+  type: book
+
+book:
+  title: "Examples in Time Series Analysis and Application"
+  author: "Youngrok Lee"
+  date: "7/2/2024"
+  chapters:
+    - index.qmd
+    - ch01_smoothing.qmd
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+

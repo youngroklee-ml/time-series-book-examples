@@ -1,0 +1,82 @@
+# Smoothing
+
+```{r}
+library(tidyverse)
+library(tsibble)
+library(feasts)
+```
+
+## Example 1.1
+
+### Data
+
+Create a data frame.
+
+```{r}
+forest_fire <- tribble(
+  ~year, ~cnt,
+  2006, 369,
+  2007, 418,
+  2008, 389,
+  2009, 570,
+  2010, 282,
+  2011, 277,
+  2012, 197,
+  2013, 296,
+  2014, 492,
+  2015, 623,
+  2016, 391
+)
+```
+
+### Convert to time-series data
+
+Convert the data frame to time series data frame (`tsibble`) object. You must set `index` with a column that represents timepoints for the series. Please note that `tsibble` automatically notice that the index is year and that the series is regular yearly series.
+
+```{r}
+forest_fire_ts <-
+  forest_fire |>
+  as_tsibble(index = year)
+
+forest_fire_ts
+```
+
+
+### Moving average
+
+Compute moving average by calling `slider::slide_mean()`. Set `complete = TRUE` to return missing value `NA` when there are missing observations in the sliding window.
+
+```{r}
+forest_fire_ma <-
+  forest_fire_ts |>
+  mutate(
+    ma3 = slider::slide_mean(cnt, before = 2, after = 0, complete = TRUE),
+    ma6 = slider::slide_mean(cnt, before = 5, after = 0, complete = TRUE)
+  )
+
+forest_fire_ma
+```
+
+Now, `forest_fire_ma` is a time series data frame with three series: original value `cnt`, 3-yr moving average `ma3`, and 6-yr moving average `ma6`. 
+
+
+### Visualization
+
+Covert this to a long form by calling `pivot_longer()`. The resulting time series data frame will have `key` that is a label of each series.
+
+```{r}
+forest_fire_ma_long <- 
+  forest_fire_ma |>
+  pivot_longer(c(cnt, ma3, ma6), names_to = "statistics")
+
+forest_fire_ma_long
+```
+
+
+Visualize time series data. `autoplot()` for time series data frame draws line plot, where each line is corresponding to each `key` value.
+
+```{r}
+autoplot(forest_fire_ma_long)
+```
+
+
