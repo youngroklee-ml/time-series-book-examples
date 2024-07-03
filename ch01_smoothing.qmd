@@ -73,10 +73,11 @@ forest_fire_ma_long
 ```
 
 
-Visualize time series data. `autoplot()` for time series data frame draws line plot, where each line is corresponding to each `key` value.
+Visualize time series data. Call `autoplot()` with measurement variable name to draws line plot by each `key`.
 
 ```{r}
-autoplot(forest_fire_ma_long)
+forest_fire_ma_long |> 
+  autoplot(value)
 ```
 
 
