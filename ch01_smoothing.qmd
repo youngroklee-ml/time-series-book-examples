@@ -4,6 +4,7 @@
 library(tidyverse)
 library(tsibble)
 library(feasts)
+library(readxl)
 ```
 
 ## Example 1.1
@@ -80,4 +81,92 @@ forest_fire_ma_long |>
   autoplot(value)
 ```
 
+
+## Example 1.2
+
+### Load data
+
+```{r}
+household <- 
+  read_excel("data/J01.xlsx", skip = 1) |> 
+  rename(cnt = `#households`)
+```
+
+### Convert to time-series data
+
+```{r}
+household_ts <-
+  household |> 
+  as_tsibble(index = year)
+
+household_ts
+```
+
+
+### Train/test split
+
+```{r}
+household_ts_train <-
+  household_ts |> 
+  filter(year <= 2014)
+
+household_ts_test <-
+  household_ts |> 
+  filter(year > 2014)
+```
+
+
+### Double moving average with N = 4
+
+```{r}
+N <- 4
+
+household_double_ma <-
+  household_ts_train |> 
+  mutate(
+    ma = slider::slide_mean(cnt, before = N - 1, after = 0, complete = TRUE),
+    ma_double = slider::slide_mean(ma, before = N - 1, after = 0, complete = TRUE)
+  )
+
+household_double_ma
+```
+
+Visualize results.
+
+```{r}
+household_double_ma |> 
+  pivot_longer(c(cnt, ma, ma_double), names_to = "statistics") |> 
+  autoplot(value)
+```
+
+
+### Estimate a slope
+
+Take the latest moving average and double moving average.
+
+```{r}
+latest <- 
+  household_double_ma |> 
+  slice_tail(n = 1)
+
+latest
+```
+
+Compute a slope
+
+```{r}
+b <- (latest$ma - latest$ma_double) / (N - 1) * 2
+b
+```
+
+
+### Prediction
+
+```{r}
+household_ts_test |> 
+  mutate(
+    ma = latest$ma,
+    ma_double = 2 * latest$ma - latest$ma_double + (year - latest$year) * b
+  )
+```
 
