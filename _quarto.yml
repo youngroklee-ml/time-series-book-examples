@@ -8,12 +8,11 @@ book:
   chapters:
     - index.qmd
     - ch01_smoothing.qmd
+  repo-url: https://github.com/youngroklee-ml/time-series-book-examples
 
 format:
   html:
     theme: cosmo
-  pdf:
-    documentclass: scrreprt
 
 
 
