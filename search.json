@@ -1,0 +1,32 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Examples in Time Series Analysis and Application",
+    "section": "",
+    "text": "Preface\nThis is a R implementation of examples in “Time Series Analysis and Application” by Chi-Hyuck Jun.",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "ch01_smoothing.html",
+    "href": "ch01_smoothing.html",
+    "title": "1  Smoothing",
+    "section": "",
+    "text": "1.1 Example 1.1",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Smoothing</span>"
+    ]
+  },
+  {
+    "objectID": "ch01_smoothing.html#example-1.1",
+    "href": "ch01_smoothing.html#example-1.1",
+    "title": "1  Smoothing",
+    "section": "",
+    "text": "1.1.1 Data\nCreate a data frame.\n\nforest_fire &lt;- tribble(\n  ~year, ~cnt,\n  2006, 369,\n  2007, 418,\n  2008, 389,\n  2009, 570,\n  2010, 282,\n  2011, 277,\n  2012, 197,\n  2013, 296,\n  2014, 492,\n  2015, 623,\n  2016, 391\n)\n\n\n\n1.1.2 Convert to time-series data\nConvert the data frame to time series data frame (tsibble) object. You must set index with a column that represents timepoints for the series. Please note that tsibble automatically notice that the index is year and that the series is regular yearly series.\n\nforest_fire_ts &lt;-\n  forest_fire |&gt;\n  as_tsibble(index = year)\n\nforest_fire_ts\n\n# A tsibble: 11 x 2 [1Y]\n    year   cnt\n   &lt;dbl&gt; &lt;dbl&gt;\n 1  2006   369\n 2  2007   418\n 3  2008   389\n 4  2009   570\n 5  2010   282\n 6  2011   277\n 7  2012   197\n 8  2013   296\n 9  2014   492\n10  2015   623\n11  2016   391\n\n\n\n\n1.1.3 Moving average\nCompute moving average by calling slider::slide_mean(). Set complete = TRUE to return missing value NA when there are missing observations in the sliding window.\n\nforest_fire_ma &lt;-\n  forest_fire_ts |&gt;\n  mutate(\n    ma3 = slider::slide_mean(cnt, before = 2, after = 0, complete = TRUE),\n    ma6 = slider::slide_mean(cnt, before = 5, after = 0, complete = TRUE)\n  )\n\nforest_fire_ma\n\n# A tsibble: 11 x 4 [1Y]\n    year   cnt   ma3   ma6\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n 1  2006   369   NA    NA \n 2  2007   418   NA    NA \n 3  2008   389  392    NA \n 4  2009   570  459    NA \n 5  2010   282  414.   NA \n 6  2011   277  376.  384.\n 7  2012   197  252   356.\n 8  2013   296  257.  335.\n 9  2014   492  328.  352.\n10  2015   623  470.  361.\n11  2016   391  502   379.\n\n\nNow, forest_fire_ma is a time series data frame with three series: original value cnt, 3-yr moving average ma3, and 6-yr moving average ma6.\n\n\n1.1.4 Visualization\nCovert this to a long form by calling pivot_longer(). The resulting time series data frame will have key that is a label of each series.\n\nforest_fire_ma_long &lt;- \n  forest_fire_ma |&gt;\n  pivot_longer(c(cnt, ma3, ma6), names_to = \"statistics\")\n\nforest_fire_ma_long\n\n# A tsibble: 33 x 3 [1Y]\n# Key:       statistics [3]\n    year statistics value\n   &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;\n 1  2006 cnt          369\n 2  2006 ma3           NA\n 3  2006 ma6           NA\n 4  2007 cnt          418\n 5  2007 ma3           NA\n 6  2007 ma6           NA\n 7  2008 cnt          389\n 8  2008 ma3          392\n 9  2008 ma6           NA\n10  2009 cnt          570\n# ℹ 23 more rows\n\n\nVisualize time series data. autoplot() for time series data frame draws line plot, where each line is corresponding to each key value.\n\nautoplot(forest_fire_ma_long)\n\nPlot variable not specified, automatically selected `.vars = value`\n\n\nWarning: Removed 7 rows containing missing values or values outside the scale range\n(`geom_line()`).",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Smoothing</span>"
+    ]
+  }
+]
