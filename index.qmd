@@ -2,3 +2,5 @@
 
 This is a R implementation of examples in "Time Series Analysis and Application" by Chi-Hyuck Jun.
 
+- Book: [시계열 분석 및 응용](http://www.freeaca.com/new/book/MainBookView.aspx?bookid=30746&page=1&ca1=0&ca2=0&sword=시계열%20분석%20및%20응용&stype=subject)
+- Data download: [자유아카데미 자료실](http://www.freeaca.com/new/library/BoardFileList.aspx?page=1&sword=시계열%20분석%20및%20응용&stype=title&area=2)
