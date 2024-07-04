@@ -172,7 +172,7 @@ household_ts_test |>
 ```
 
 
-## Example 1.3
+## Examples 1.3 - 1.4
 
 ### Load data
 
@@ -205,7 +205,9 @@ patent_ts_test <-
   filter(year > 2013)
 ```
 
-### Exponential smoothing and double exponential smoothing with $\alpha = 0.2$
+### Example 1.3: Double exponential smoothing with $\alpha = 0.2$
+
+#### Smoothing on training data
 
 ```{r}
 alpha <- 0.2
@@ -236,7 +238,7 @@ patent_ets |>
 ```
 
 
-### Estimate coefficients
+#### Estimate coefficients
 
 Take the last training time point.
 
@@ -245,7 +247,7 @@ latest <-
   patent_ets |> 
   slice_tail(n = 1)
 
-T <- nrow(patent_ets)
+n_train <- nrow(patent_ets)
 latest_year <- latest$year
 ```
 
@@ -259,17 +261,86 @@ b
 Estimate constant `c`.
 
 ```{r}
-c <- 2 * latest$es - latest$es_double - b * T
+c <- 2 * latest$es - latest$es_double - b * n_train
 c
 ```
 
 
-### Prediction
+#### Prediction
 
 ```{r}
 patent_ts_test |> 
   mutate(
-    forecast = c + b * (T + (year - latest_year)),
+    forecast = c + b * (n_train + (year - latest_year)),
+    forecast_error = cnt - forecast
+  )
+```
+
+
+### Example 1.4: Holt linear
+
+#### Smoothing on training data
+
+Implement a function to update `L` and `b` in each iteration (i.e. each additional observation).
+
+```{r}
+holt_step <- function(param, x, alpha, beta) {
+  L <- param$L
+  b <- param$b
+
+  L_new = alpha * x + (1 - alpha) * (L + b)
+  b_new = beta * (L_new - L) + (1 - beta) * b
+
+  res <- list(L = L_new, b = b_new)
+
+  res
+}
+```
+
+Set parameters for Holt smoothing.
+
+```{r}
+alpha <- 0.2
+beta <- 0.2
+```
+
+Initialize `L` and `b` values.
+
+```{r}
+L1 <- patent_ts_train$cnt[1]
+b1 <- patent_ts_train$cnt[2] - patent_ts_train$cnt[1]
+```
+
+Compute Holt smoothing over training time periods.
+
+```{r}
+patent_holt <- 
+  patent_ts_train |> 
+  mutate(
+    es_double = accumulate(patent_ts_train$cnt[-1], holt_step, .init = list(L = L1, b = b1), alpha = alpha, beta = beta)
+  ) |> 
+  unnest_wider(es_double)
+```
+
+
+#### Prediction
+
+Obtain the latest value of `L` and `b`.
+
+```{r}
+latest <- 
+  patent_holt |> 
+  slice_tail(n = 1)
+
+latest
+```
+
+Make a prediction on test data with linear trend assumption.
+
+```{r}
+patent_ts_test |> 
+  mutate(
+    forecast = latest$L + latest$b * (year - latest$year),
     forecast_error = cnt - forecast
   )
 ```
