@@ -2,8 +2,9 @@
 
 ```{r}
 library(tidyverse)
-library(tsibble)
-library(feasts)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
 library(readxl)
 ```
 
@@ -169,4 +170,108 @@ household_ts_test |>
     ma_double = 2 * latest$ma - latest$ma_double + (year - latest$year) * b
   )
 ```
+
+
+## Example 1.3
+
+### Load data
+
+```{r}
+patent <- 
+  read_excel("data/J02.xlsx") |> 
+  rename(cnt = `#patents`)
+```
+
+### Convert to time-series data
+
+```{r}
+patent_ts <-
+  patent |> 
+  as_tsibble(index = year)
+
+patent_ts
+```
+
+
+### Train/test split
+
+```{r}
+patent_ts_train <-
+  patent_ts |> 
+  filter(year <= 2013)
+
+patent_ts_test <- 
+  patent_ts |> 
+  filter(year > 2013)
+```
+
+### Exponential smoothing and double exponential smoothing with $\alpha = 0.2$
+
+```{r}
+alpha <- 0.2
+
+ets_step <- function(x, y, alpha) {
+  stopifnot(alpha >= 0)
+  stopifnot(alpha <= 1)
+  (1 - alpha) * x + alpha * y
+}
+
+patent_ets <- 
+  patent_ts_train |> 
+  mutate(
+    es = accumulate(cnt, ets_step, alpha = alpha),
+    es_double = accumulate(es, ets_step, alpha = alpha)
+  )
+
+patent_ets
+```
+
+
+Visualize the smoothing results.
+
+```{r}
+patent_ets |> 
+  pivot_longer(c(cnt, es, es_double), names_to = "statistics") |> 
+  autoplot(value)
+```
+
+
+### Estimate coefficients
+
+Take the last training time point.
+
+```{r}
+latest <- 
+  patent_ets |> 
+  slice_tail(n = 1)
+
+T <- nrow(patent_ets)
+latest_year <- latest$year
+```
+
+Estimate slope `b`.
+
+```{r}
+b <- alpha / (1 - alpha) * (latest$es - latest$es_double)
+b
+```
+
+Estimate constant `c`.
+
+```{r}
+c <- 2 * latest$es - latest$es_double - b * T
+c
+```
+
+
+### Prediction
+
+```{r}
+patent_ts_test |> 
+  mutate(
+    forecast = c + b * (T + (year - latest_year)),
+    forecast_error = cnt - forecast
+  )
+```
+
 
