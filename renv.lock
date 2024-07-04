@@ -456,6 +456,26 @@
       ],
       "Hash": "a1066cbc05caee9a4bf6d90f194ff4da"
     },
+    "fable": {
+      "Package": "fable",
+      "Version": "0.3.4",
+      "Source": "Repository",
+      "Repository": "https://packagemanager.posit.co/cran/2024-07-02",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "distributional",
+        "dplyr",
+        "fabletools",
+        "rlang",
+        "stats",
+        "tibble",
+        "tidyr",
+        "tsibble",
+        "utils"
+      ],
+      "Hash": "143f72e07e384851f2f2f94a04444793"
+    },
     "fabletools": {
       "Package": "fabletools",
       "Version": "0.4.2",
