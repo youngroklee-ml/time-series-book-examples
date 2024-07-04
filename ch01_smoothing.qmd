@@ -321,6 +321,8 @@ patent_holt <-
   ) |> 
   unnest_wider(es_double) |> 
   as_tsibble(index = year)
+
+patent_holt
 ```
 
 :::{.callout-note}
