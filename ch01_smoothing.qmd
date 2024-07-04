@@ -59,6 +59,11 @@ forest_fire_ma <-
 forest_fire_ma
 ```
 
+
+:::{.callout-note}
+`{slider}` package provides functions to conduct rolling analysis using window functions. `slide_*()` function family is useful for time series with regular observations (i.e. no missing time period) as in this example. If your time series appear to be irregular, `slide_index_*()` function family would be useful.
+:::
+
 Now, `forest_fire_ma` is a time series data frame with three series: original value `cnt`, 3-yr moving average `ma3`, and 6-yr moving average `ma6`. 
 
 
