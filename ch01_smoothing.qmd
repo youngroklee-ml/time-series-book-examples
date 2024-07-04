@@ -319,7 +319,20 @@ patent_holt <-
   mutate(
     es_double = accumulate(patent_ts_train$cnt[-1], holt_step, .init = list(L = L1, b = b1), alpha = alpha, beta = beta)
   ) |> 
-  unnest_wider(es_double)
+  unnest_wider(es_double) |> 
+  as_tsibble(index = year)
+```
+
+:::{.callout-note}
+`unnest_wider()` returns `tibble` object, not `tsibble` object. sCall `as_tsibble()` to convert the results back to `tsibble` object.
+:::
+
+Visualize smoothing results.
+
+```{r}
+patent_holt |> 
+  pivot_longer(c(cnt, L), names_to = "statistics") |> 
+  autoplot(value)
 ```
 
 
