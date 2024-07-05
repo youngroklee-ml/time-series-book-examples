@@ -366,6 +366,69 @@ patent_ts_test |>
 ```
 
 
+#### Use `{fable}`
+
+Let us use `ETS()` from `{fable}`. The approach is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt.html) by Rob J Hyndman and George Athanasopoulos.
+
+First, let us use the same `alpha` and `beta` that were used in the previous section.
+
+```{r}
+alpha <- 0.2
+beta <- 0.2
+
+fit <- 
+  patent_ts_train |> 
+  model(ANN = ETS(cnt ~ error("A") + trend("A", alpha = alpha, beta = beta) + season("N")))
+
+fitted(fit)
+```
+
+Let us print estimated levels and slopes in training data
+
+```{r}
+fit$ANN[[1]]$fit$states
+```
+
+The results are different from previous section, because of different initialization of level and slope parameter value.
+
+```{r}
+fit |> 
+  select(ANN) |> 
+  report()
+```
+
+Let us create a forecast.
+
+```{r}
+fit |> 
+  forecast(h = 3)
+```
+
+
+Now, call `ETS()` without specifying `alpha` and `beta` argument, so it finds the optimal value for fitting.
+
+```{r}
+fit_opt <- 
+  patent_ts_train |> 
+  model(ANN = ETS(cnt ~ error("A") + trend("A") + season("N")))
+
+fitted(fit_opt)
+```
+
+```{r}
+fit_opt |> 
+  select(ANN) |> 
+  report()
+```
+
+```{r}
+fit_opt |> 
+  forecast(h = 3)
+```
+
+
+
+
 ## Example 1.5
 
 ### Load data
