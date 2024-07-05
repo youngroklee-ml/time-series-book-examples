@@ -368,9 +368,21 @@ patent_ts_test |>
 
 #### Use `{fable}`
 
-Let us use `ETS()` from `{fable}`. The approach is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt.html) by Rob J Hyndman and George Athanasopoulos.
+Let us use `ETS()` from `{fable}`. The function name stands for Error-Trend-Seasonality. The approach is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt.html) by Rob J Hyndman and George Athanasopoulos.
 
-First, let us use the same `alpha` and `beta` that were used in the previous section.
+Smoothing parameters `alpha` within `ETS()` is the same to what we used in the previous section, but `beta` within `ETS()` is different from it of the previous chapter. In the following equations, $\beta^{*}$ is `beta` used in the previous section, while $\beta = \alpha \beta^{*}$ is `beta` in `ETS()`.
+
+$$
+\begin{eqnarray*}
+l_t &=& \alpha y_t + (1 - \alpha)(l_{t - 1} + b_{t - 1})\\
+b_t &=& \beta^{*}(l_t - l_{t - 1}) + (1 - \beta^{*})b_{t - 1}\\
+    &=& \beta^{*}((y_t + (1 - \alpha)(l_{t - 1} + b_{t - 1})) - l_{t - 1}) + (1 - \beta^{*})b_{t - 1}\\
+    &=& b_{t - 1} + \alpha \beta^{*} (y_t - l_{t - 1} - b_{t - 1})\\
+    &=& b_{t - 1} + \beta \varepsilon_t
+\end{eqnarray*}
+$$
+
+where $\beta = \alpha \beta^{*}$ and $\varepsilon_t = y_t - l_{t - 1} - b_{t - 1}$.
 
 ```{r}
 alpha <- 0.2
@@ -378,22 +390,22 @@ beta <- 0.2
 
 fit <- 
   patent_ts_train |> 
-  model(ANN = ETS(cnt ~ error("A") + trend("A", alpha = alpha, beta = beta) + season("N")))
+  model(AAN = ETS(cnt ~ error("A") + trend("A", alpha = alpha, beta = alpha * beta) + season("N")))
 
-fitted(fit)
+augment(fit)
 ```
 
 Let us print estimated levels and slopes in training data
 
 ```{r}
-fit$ANN[[1]]$fit$states
+fit$AAN[[1]]$fit$states
 ```
 
-The results are different from previous section, because of different initialization of level and slope parameter value.
+The results are still slightly different from previous section, because of different initialization of level and slope parameter value.
 
 ```{r}
 fit |> 
-  select(ANN) |> 
+  select(AAN) |> 
   report()
 ```
 
@@ -410,22 +422,42 @@ Now, call `ETS()` without specifying `alpha` and `beta` argument, so it finds th
 ```{r}
 fit_opt <- 
   patent_ts_train |> 
-  model(ANN = ETS(cnt ~ error("A") + trend("A") + season("N")))
+  model(AAN = ETS(cnt ~ error("A") + trend("A") + season("N")))
 
 fitted(fit_opt)
 ```
 
+Check the optimized smoothing paramters and initial states.
+
 ```{r}
 fit_opt |> 
-  select(ANN) |> 
+  select(AAN) |> 
   report()
 ```
+
+
+Let us visualize estimated level, slope, and errors in the training data.
+
+```{r}
+fit_opt |> 
+  components() |> 
+  autoplot()
+```
+
+Make forecast for next three years.
 
 ```{r}
 fit_opt |> 
   forecast(h = 3)
 ```
 
+And visualize the forecast.
+
+```{r}
+fit_opt |> 
+  forecast(h = 3) |> 
+  autoplot(patent_ts_train)
+```
 
 
 
