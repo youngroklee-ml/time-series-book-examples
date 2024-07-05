@@ -282,7 +282,7 @@ patent_ts_test |>
 ```
 
 
-### Example 1.4: Holt linear
+### Example 1.4: Holt's linear trend method
 
 #### Smoothing on training data
 
@@ -365,4 +365,179 @@ patent_ts_test |>
   )
 ```
 
+
+## Example 1.5
+
+### Load data
+
+```{r}
+gas_consumption <- read_excel("data/J03.xlsx", skip = 1) |> 
+  fill(year, .direction = "down") |> 
+  rename(consumption = comsumption) # fix typo in column name
+
+gas_consumption
+```
+
+### Convert to tsibble object
+
+```{r}
+gas_consumption_ts <- 
+  gas_consumption |> 
+  mutate(year_month = make_yearmonth(year, month), .before = 1L) |> 
+  select(!c(year, month)) |> 
+  as_tsibble(index = year_month)
+
+gas_consumption_ts
+```
+
+
+### Visualize seasonal pattern
+
+Call `gg_season()` from `{feasts}` package to visualize seasonal pattern of the variable of interest.
+
+```{r}
+gas_consumption_ts |> 
+  gg_season(consumption)
+```
+
+### Train/test data split
+
+```{r}
+gas_consumption_ts_train <- 
+  gas_consumption_ts |> 
+  filter(year_month < make_yearmonth(2017, 1))
+
+gas_consumption_ts_test <- 
+  gas_consumption_ts |> 
+  filter(year_month >= make_yearmonth(2017, 1))
+```
+
+
+### Holt-Winters' multiplicative method
+
+#### Initialization
+
+Extract first 2 years data.
+
+```{r}
+m <- 12
+r <- 2
+
+gas_consumption_ts_init <-
+  gas_consumption_ts_train |> 
+  slice_head(n = m * r)
+```
+
+Compute an initial slope parameter value.
+
+```{r}
+b <- 
+  gas_consumption_ts_init |> 
+  mutate(slope = difference(consumption, lag = 12) / m) |> 
+  pull(slope) |> 
+  mean(na.rm= TRUE)
+
+b
+```
+
+Compute initial seasonal factor values.
+
+```{r}
+s <-
+  gas_consumption_ts_init |> 
+  group_by(year(year_month)) |> 
+  mutate(seasonal = consumption / mean(consumption)) |> 
+  group_by(month(year_month)) |> 
+  mutate(seasonal = mean(seasonal)) |> 
+  ungroup() |> 
+  select(year_month, consumption, seasonal) |> 
+  slice_head(n = m) |> 
+  pull(seasonal)
+
+s
+```
+
+Compute initial level.
+
+```{r}
+l <- mean(gas_consumption_ts_init$consumption)
+l
+```
+
+
+#### Smoothing on training data
+
+```{r}
+n_train <- nrow(gas_consumption_ts_train)
+b_vec <- vector("numeric", length = m + n_train)
+s_vec <- vector("numeric", length = m + n_train)
+l_vec <- vector("numeric", length = m + n_train)
+x_vec <- vector("numeric", length = m + n_train)
+
+b_vec[m] <- b
+s_vec[1:m] <- s
+l_vec[m] <- l
+x_vec[m + seq_len(n_train)] <- gas_consumption_ts_train$consumption
+```
+
+```{r}
+alpha <- 0.1
+beta <- 0.1
+gamma <- 0.1
+
+for (t in (m + 1):length(b_vec)) {
+  l_vec[t] <- alpha * x_vec[t] / s_vec[t - m] + (1 - alpha) * (l_vec[t - 1] + b_vec[t - 1])
+  b_vec[t] <- beta * (l_vec[t] - l_vec[t - 1]) + (1 - beta) * b_vec[t - 1]
+  s_vec[t] <- gamma * (x_vec[t] / l_vec[t]) + (1 - gamma) * s_vec[t - m]
+}
+```
+
+
+```{r}
+gas_consumption_winters <- 
+  gas_consumption_ts_train |> 
+  mutate(
+    l = l_vec[-seq_len(m)],
+    b = b_vec[-seq_len(m)],
+    s = s_vec[-seq_len(m)]
+  )
+
+gas_consumption_winters |> 
+  tail(n = m)
+```
+
+
+#### Forecast
+
+```{r}
+l_latest <- 
+  gas_consumption_winters |> 
+  slice_tail(n = 1) |> 
+  pull(l)
+
+b_latest <- 
+  gas_consumption_winters |> 
+  slice_tail(n = 1) |> 
+  pull(b)
+
+s_latest <- 
+  gas_consumption_winters |> 
+  slice_tail(n = m) |> 
+  pull(s)
+
+month_latest <- 
+  gas_consumption_winters |> 
+  slice_tail(n = 1) |> 
+  pull(year_month)
+```
+
+
+```{r}
+gas_consumption_ts_test |> 
+  mutate(
+    k = year_month - month_latest,
+    forecast = (l_latest + b_latest * k) * s_latest[(k - 1) %% m + 1],
+    forecast_error = consumption - forecast
+  )
+```
 
