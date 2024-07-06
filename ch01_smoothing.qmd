@@ -642,10 +642,10 @@ gas_consumption_ts_test |>
 Holt-Winters' method can also be implemented in `ETS()` by specifying `season()` component. Here, set the multiplicative model that was specified in the previous section. `ETS()` for Holt-Winters' method is is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt-winters.html) by Rob J Hyndman and George Athanasopoulos.
 
 
-`gamma` parameter in `ETS()` is slightly different from `gamma` parameter in the previous section. Let $\gamma^{*}$ be the `gamma` in the previous section and $\gamma$ be the `gamma` in `ETS().
+`gamma` parameter in `ETS()` is slightly different from `gamma` parameter in the previous section. Let $\gamma^{*}$ be the `gamma` in the previous section and $\gamma$ be the `gamma` in `ETS()`.
 
 $$
-\begin(eqnarray*)
+\begin{eqnarray*}
 s_t &=& \gamma^{*}\frac{y_t}{l_t} + (1 - \gamma^{*})s_{t - m}\\
     &=& \gamma\frac{y_t}{l_{t - 1} + b_{t - 1}} + (1 - \gamma)s_{t - m}
 \end{eqnarray*}
