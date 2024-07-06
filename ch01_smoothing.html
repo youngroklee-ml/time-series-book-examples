@@ -1277,9 +1277,9 @@ Model: ETS(A,A,N)
 <section id="use-fableets-1" class="level3" data-number="1.4.6">
 <h3 data-number="1.4.6" class="anchored" data-anchor-id="use-fableets-1"><span class="header-section-number">1.4.6</span> Use <code>fable::ETS()</code></h3>
 <p>Holt-Winters’ method can also be implemented in <code>ETS()</code> by specifying <code>season()</code> component. Here, set the multiplicative model that was specified in the previous section. <code>ETS()</code> for Holt-Winters’ method is is explained in <a href="https://otexts.com/fpp3/holt-winters.html">Forecasting: Principles and Practice</a> by Rob J Hyndman and George Athanasopoulos.</p>
-<p><code>gamma</code> parameter in <code>ETS()</code> is slightly different from <code>gamma</code> parameter in the previous section. Let <span class="math inline">\(\gamma^{*}\)</span> be the <code>gamma</code> in the previous section and <span class="math inline">\(\gamma\)</span> be the <code>gamma</code> in `ETS().</p>
+<p><code>gamma</code> parameter in <code>ETS()</code> is slightly different from <code>gamma</code> parameter in the previous section. Let <span class="math inline">\(\gamma^{*}\)</span> be the <code>gamma</code> in the previous section and <span class="math inline">\(\gamma\)</span> be the <code>gamma</code> in <code>ETS()</code>.</p>
 <p><span class="math display">\[
-\begin(eqnarray*)
+\begin{eqnarray*}
 s_t &amp;=&amp; \gamma^{*}\frac{y_t}{l_t} + (1 - \gamma^{*})s_{t - m}\\
     &amp;=&amp; \gamma\frac{y_t}{l_{t - 1} + b_{t - 1}} + (1 - \gamma)s_{t - m}
 \end{eqnarray*}
