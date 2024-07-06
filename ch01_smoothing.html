@@ -227,6 +227,15 @@ window.Quarto = {
   <li><a href="#holt-winters-multiplicative-method" id="toc-holt-winters-multiplicative-method" class="nav-link" data-scroll-target="#holt-winters-multiplicative-method"><span class="header-section-number">1.4.5</span> Holt-Winters’ multiplicative method</a></li>
   <li><a href="#use-fableets-1" id="toc-use-fableets-1" class="nav-link" data-scroll-target="#use-fableets-1"><span class="header-section-number">1.4.6</span> Use <code>fable::ETS()</code></a></li>
   </ul></li>
+  <li><a href="#example-1.6" id="toc-example-1.6" class="nav-link" data-scroll-target="#example-1.6"><span class="header-section-number">1.5</span> Example 1.6</a>
+  <ul class="collapse">
+  <li><a href="#load-data-3" id="toc-load-data-3" class="nav-link" data-scroll-target="#load-data-3"><span class="header-section-number">1.5.1</span> Load data</a></li>
+  <li><a href="#traintest-split-2" id="toc-traintest-split-2" class="nav-link" data-scroll-target="#traintest-split-2"><span class="header-section-number">1.5.2</span> Train/test split</a></li>
+  <li><a href="#detrend-training-data" id="toc-detrend-training-data" class="nav-link" data-scroll-target="#detrend-training-data"><span class="header-section-number">1.5.3</span> Detrend training data</a></li>
+  <li><a href="#deseasonalize-data" id="toc-deseasonalize-data" class="nav-link" data-scroll-target="#deseasonalize-data"><span class="header-section-number">1.5.4</span> Deseasonalize data</a></li>
+  <li><a href="#use-feastsclassical_decomposition" id="toc-use-feastsclassical_decomposition" class="nav-link" data-scroll-target="#use-feastsclassical_decomposition"><span class="header-section-number">1.5.5</span> Use <code>feasts::classical_decomposition()</code></a></li>
+  <li><a href="#forecast-1" id="toc-forecast-1" class="nav-link" data-scroll-target="#forecast-1"><span class="header-section-number">1.5.6</span> Forecast</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -1448,6 +1457,256 @@ s_t &amp;=&amp; \gamma^{*}\frac{y_t}{l_t} + (1 - \gamma^{*})s_{t - m}\\
 <p><img src="ch01_smoothing_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
+</div>
+</div>
+</section>
+</section>
+<section id="example-1.6" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="example-1.6"><span class="header-section-number">1.5</span> Example 1.6</h2>
+<section id="load-data-3" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="load-data-3"><span class="header-section-number">1.5.1</span> Load data</h3>
+<p>Load data from excel file, process it and convert it to be time series data frame <code>tsibble</code> object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>electric_consumption <span class="ot">&lt;-</span> </span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"data/J04.xlsx"</span>, <span class="at">skip =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(<span class="st">`</span><span class="at">Y/Q</span><span class="st">`</span>, <span class="dv">1</span>, <span class="dv">4</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(year, <span class="at">.direction =</span> <span class="st">"down"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span> </span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quarter =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb108-7"><a href="#cb108-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb108-8"><a href="#cb108-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_quarter =</span> <span class="fu">make_yearquarter</span>(year, quarter)) <span class="sc">|&gt;</span> </span>
+<span id="cb108-9"><a href="#cb108-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year_quarter, consumption) <span class="sc">|&gt;</span> </span>
+<span id="cb108-10"><a href="#cb108-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year_quarter)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `year = as.numeric(str_sub(`Y/Q`, 1, 4))`.
+Caused by warning:
+! NAs introduced by coercion</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>electric_consumption</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 84 x 2 [1Q]
+   year_quarter consumption
+          &lt;qtr&gt;       &lt;dbl&gt;
+ 1      1997 Q1        1461
+ 2      1997 Q2        1406
+ 3      1997 Q3        1710
+ 4      1997 Q4        1514
+ 5      1998 Q1        1501
+ 6      1998 Q2        1426
+ 7      1998 Q3        1655
+ 8      1998 Q4        1540
+ 9      1999 Q1        1638
+10      1999 Q2        1583
+# ℹ 74 more rows</code></pre>
+</div>
+</div>
+<p>Visualize the series.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>electric_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(consumption)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch01_smoothing_files/figure-html/unnamed-chunk-63-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="traintest-split-2" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="traintest-split-2"><span class="header-section-number">1.5.2</span> Train/test split</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>electric_consumption_train <span class="ot">&lt;-</span> </span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>  electric_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(year_quarter) <span class="sc">&lt;=</span> <span class="dv">2015</span>)</span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a>electric_consumption_test <span class="ot">&lt;-</span> </span>
+<span id="cb113-6"><a href="#cb113-6" aria-hidden="true" tabindex="-1"></a>  electric_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb113-7"><a href="#cb113-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(year_quarter) <span class="sc">&gt;</span> <span class="dv">2015</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="detrend-training-data" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="detrend-training-data"><span class="header-section-number">1.5.3</span> Detrend training data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>detrended <span class="ot">&lt;-</span></span>
+<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a>  electric_consumption_train <span class="sc">|&gt;</span> </span>
+<span id="cb114-5"><a href="#cb114-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb114-6"><a href="#cb114-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">trend =</span> slider<span class="sc">::</span><span class="fu">slide_mean</span>(consumption, <span class="at">before =</span> <span class="dv">2</span>, <span class="at">after =</span> <span class="dv">1</span>, <span class="at">complete =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb114-7"><a href="#cb114-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">trend =</span> slider<span class="sc">::</span><span class="fu">slide_mean</span>(trend, <span class="at">before =</span> <span class="dv">0</span>, <span class="at">after =</span> <span class="dv">1</span>, <span class="at">complete =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb114-8"><a href="#cb114-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">detrended =</span> consumption <span class="sc">-</span> trend</span>
+<span id="cb114-9"><a href="#cb114-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb114-10"><a href="#cb114-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-11"><a href="#cb114-11" aria-hidden="true" tabindex="-1"></a>detrended</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 76 x 4 [1Q]
+   year_quarter consumption trend detrended
+          &lt;qtr&gt;       &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+ 1      1997 Q1        1461   NA       NA  
+ 2      1997 Q2        1406   NA       NA  
+ 3      1997 Q3        1710 1528.     182. 
+ 4      1997 Q4        1514 1535.     -21.2
+ 5      1998 Q1        1501 1531.     -29.9
+ 6      1998 Q2        1426 1527.    -101. 
+ 7      1998 Q3        1655 1548.     107. 
+ 8      1998 Q4        1540 1584.     -44.4
+ 9      1999 Q1        1638 1628.      10.5
+10      1999 Q2        1583 1675.     -91.8
+# ℹ 66 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="deseasonalize-data" class="level3" data-number="1.5.4">
+<h3 data-number="1.5.4" class="anchored" data-anchor-id="deseasonalize-data"><span class="header-section-number">1.5.4</span> Deseasonalize data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>seasonality <span class="ot">&lt;-</span> </span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>  detrended <span class="sc">|&gt;</span> </span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quarter =</span> <span class="fu">quarter</span>(year_quarter)) <span class="sc">|&gt;</span> </span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(quarter) <span class="sc">|&gt;</span> </span>
+<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">s =</span> <span class="fu">mean</span>(detrended, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">s =</span> s <span class="sc">-</span> <span class="fu">mean</span>(s)) <span class="sc">|&gt;</span> </span>
+<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(s)</span>
+<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a>seasonality</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  353.973958 -225.630208   -5.581597 -122.762153</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>deseasonalized <span class="ot">&lt;-</span> </span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>  detrended <span class="sc">|&gt;</span> </span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">seasonal =</span> seasonality[<span class="fu">quarter</span>(year_quarter)],</span>
+<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">deseasonalized =</span> consumption <span class="sc">-</span> seasonal,</span>
+<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">random =</span> consumption <span class="sc">-</span> trend <span class="sc">-</span> seasonal</span>
+<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>deseasonalized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 76 x 7 [1Q]
+   year_quarter consumption trend detrended seasonal deseasonalized random
+          &lt;qtr&gt;       &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;  &lt;dbl&gt;
+ 1      1997 Q1        1461   NA       NA     354.            1107.   NA  
+ 2      1997 Q2        1406   NA       NA    -226.            1632.   NA  
+ 3      1997 Q3        1710 1528.     182.     -5.58          1716.  188. 
+ 4      1997 Q4        1514 1535.     -21.2  -123.            1637.  102. 
+ 5      1998 Q1        1501 1531.     -29.9   354.            1147. -384. 
+ 6      1998 Q2        1426 1527.    -101.   -226.            1652.  124. 
+ 7      1998 Q3        1655 1548.     107.     -5.58          1661.  113. 
+ 8      1998 Q4        1540 1584.     -44.4  -123.            1663.   78.4
+ 9      1999 Q1        1638 1628.      10.5   354.            1284. -343. 
+10      1999 Q2        1583 1675.     -91.8  -226.            1809.  134. 
+# ℹ 66 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="use-feastsclassical_decomposition" class="level3" data-number="1.5.5">
+<h3 data-number="1.5.5" class="anchored" data-anchor-id="use-feastsclassical_decomposition"><span class="header-section-number">1.5.5</span> Use <code>feasts::classical_decomposition()</code></h3>
+<p><code>classical_decomposition()</code> from <code>{feasts}</code> package is a short cut to decompose a series into trend, seasonality and random components. Find additional explanation from <a href="https://otexts.com/fpp3/classical-decomposition.html">Forecasting: Principles and Practice</a> by Rob J Hyndman and George Athanasopoulos.</p>
+<p>First, call <code>classical_decomposition()</code> inside <code>model()</code> function. The <code>model()</code> function returns <code>mable</code> object, which stands for “model table”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>electric_consumption_decomposition <span class="ot">&lt;-</span> </span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>  electric_consumption_train <span class="sc">|&gt;</span> </span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="fu">classical_decomposition</span>(consumption))</span>
+<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>electric_consumption_decomposition</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 1 x 1
+  `classical_decomposition(consumption)`
+                                 &lt;model&gt;
+1                        &lt;DECOMPOSITION&gt;</code></pre>
+</div>
+</div>
+<p>To see series of each component, call <code>components()</code>. This function returns <code>dable</code> object, which stands for “decomposition table”.</p>
+<p><code>trend</code>, <code>seasonal</code>, and <code>random</code> columns represent trend, seasonality, and random component, respectively. <code>season_adjust</code> represents the deseasonalized series.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>electric_consumption_decomposition <span class="sc">|&gt;</span> </span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A dable: 76 x 7 [1Q]
+# Key:     .model [1]
+# :        consumption = trend + seasonal + random
+   .model           year_quarter consumption trend seasonal random season_adjust
+   &lt;chr&gt;                   &lt;qtr&gt;       &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;
+ 1 classical_decom…      1997 Q1        1461   NA    354.     NA           1107.
+ 2 classical_decom…      1997 Q2        1406   NA   -226.     NA           1632.
+ 3 classical_decom…      1997 Q3        1710 1528.    -5.58  188.          1716.
+ 4 classical_decom…      1997 Q4        1514 1535.  -123.    102.          1637.
+ 5 classical_decom…      1998 Q1        1501 1531.   354.   -384.          1147.
+ 6 classical_decom…      1998 Q2        1426 1527.  -226.    124.          1652.
+ 7 classical_decom…      1998 Q3        1655 1548.    -5.58  113.          1661.
+ 8 classical_decom…      1998 Q4        1540 1584.  -123.     78.4         1663.
+ 9 classical_decom…      1999 Q1        1638 1628.   354.   -343.          1284.
+10 classical_decom…      1999 Q2        1583 1675.  -226.    134.          1809.
+# ℹ 66 more rows</code></pre>
+</div>
+</div>
+<p>Visualize the components.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>electric_consumption_decomposition <span class="sc">|&gt;</span> </span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch01_smoothing_files/figure-html/unnamed-chunk-70-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="forecast-1" class="level3" data-number="1.5.6">
+<h3 data-number="1.5.6" class="anchored" data-anchor-id="forecast-1"><span class="header-section-number">1.5.6</span> Forecast</h3>
+<p>Use the deseasonalized series to produce a forecast.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>fit_poly <span class="ot">&lt;-</span> </span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  deseasonalized <span class="sc">|&gt;</span> </span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">t =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(deseasonalized <span class="sc">~</span> t <span class="sc">+</span> <span class="fu">I</span>(t<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> _)</span>
+<span id="cb126-5"><a href="#cb126-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb126-6"><a href="#cb126-6" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">tidy</span>(fit_poly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept) 1098.      53.7         20.4 6.33e-32
+2 t             72.2      3.22        22.4 1.81e-34
+3 I(t^2)        -0.431    0.0405     -10.6 1.72e-16</code></pre>
+</div>
+</div>
+<p>Create forecast for two years.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>electric_consumption_test <span class="ot">&lt;-</span> </span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  electric_consumption_test <span class="sc">|&gt;</span> </span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">t =</span> <span class="fu">nrow</span>(electric_consumption_train) <span class="sc">+</span> <span class="fu">row_number</span>())</span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>electric_consumption_test <span class="sc">|&gt;</span> </span>
+<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast_trend =</span> <span class="fu">predict</span>(fit_poly, <span class="at">newdata =</span> electric_consumption_test),</span>
+<span id="cb128-8"><a href="#cb128-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast_seasonality =</span> seasonality[<span class="fu">quarter</span>(year_quarter)],</span>
+<span id="cb128-9"><a href="#cb128-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast =</span> forecast_trend <span class="sc">+</span> forecast_seasonality,</span>
+<span id="cb128-10"><a href="#cb128-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast_error =</span> consumption <span class="sc">-</span> forecast</span>
+<span id="cb128-11"><a href="#cb128-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 8 x 7 [1Q]
+  year_quarter consumption     t forecast_trend forecast_seasonality forecast
+         &lt;qtr&gt;       &lt;dbl&gt; &lt;int&gt;          &lt;dbl&gt;                &lt;dbl&gt;    &lt;dbl&gt;
+1      2016 Q1        4610    77          4101.               354.      4455.
+2      2016 Q2        3734    78          4106.              -226.      3880.
+3      2016 Q3        4365    79          4111.                -5.58    4105.
+4      2016 Q4        3943    80          4114.              -123.      3992.
+5      2017 Q1        4611    81          4117.               354.      4471.
+6      2017 Q2        3789    82          4119.              -226.      3893.
+7      2017 Q3        4448    83          4120.                -5.58    4115.
+8      2017 Q4        4088    84          4120.              -123.      3998.
+# ℹ 1 more variable: forecast_error &lt;dbl&gt;</code></pre>
 </div>
 </div>
 
