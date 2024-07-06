@@ -366,7 +366,7 @@ patent_ts_test |>
 ```
 
 
-#### Use `{fable}`
+### Use `fable::ETS()`
 
 Let us use `ETS()` from `{fable}`. The function name stands for Error-Trend-Seasonality. The approach is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt.html) by Rob J Hyndman and George Athanasopoulos.
 
@@ -635,4 +635,91 @@ gas_consumption_ts_test |>
     forecast_error = consumption - forecast
   )
 ```
+
+
+### Use `fable::ETS()`
+
+Holt-Winters' method can also be implemented in `ETS()` by specifying `season()` component. Here, set the multiplicative model that was specified in the previous section. `ETS()` for Holt-Winters' method is is explained in [Forecasting: Principles and Practice](https://otexts.com/fpp3/holt-winters.html) by Rob J Hyndman and George Athanasopoulos.
+
+
+`gamma` parameter in `ETS()` is slightly different from `gamma` parameter in the previous section. Let $\gamma^{*}$ be the `gamma` in the previous section and $\gamma$ be the `gamma` in `ETS().
+
+$$
+\begin(eqnarray*)
+s_t &=& \gamma^{*}\frac{y_t}{l_t} + (1 - \gamma^{*})s_{t - m}\\
+    &=& \gamma\frac{y_t}{l_{t - 1} + b_{t - 1}} + (1 - \gamma)s_{t - m}
+\end{eqnarray*}
+$$
+
+Let us train a model.
+
+```{r}
+alpha <- 0.1
+beta <- 0.1
+gamma <- 0.1
+
+fit <- 
+  gas_consumption_ts_train |> 
+  model(MAM = ETS(consumption ~ error("M") + trend("A", alpha = alpha, beta = alpha * beta) + season("M", gamma = gamma)))
+
+augment(fit)
+```
+
+
+See smoothing paramters.
+
+```{r}
+tidy(fit)
+```
+
+
+See fitness statistics.
+
+```{r}
+glance(fit)
+```
+
+Let us create a forecast for 1 year (i.e. 12 months).
+
+```{r}
+fit |> 
+  forecast(h = 12)
+```
+
+
+Now, let the training internally optimize the smoothing parameters.
+
+```{r}
+fit_opt <- 
+  gas_consumption_ts_train |> 
+  model(MAM = ETS(consumption ~ error("M") + trend("A") + season("M")))
+```
+
+Check the optimized smoothing parameters.
+
+```{r}
+tidy(fit_opt)
+```
+
+Check the fitness statistics.
+
+```{r}
+glance(fit_opt)
+```
+
+And create forecast for next 1 year.
+
+```{r}
+fit_opt |> 
+  forecast(h = 12)
+```
+
+Visualize the forecast as well as training data.
+
+```{r}
+fit_opt |> 
+  forecast(h = 12) |> 
+  autoplot(gas_consumption_ts_train)
+```
+
 
