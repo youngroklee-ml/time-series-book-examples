@@ -723,3 +723,150 @@ fit_opt |>
 ```
 
 
+## Example 1.6
+
+### Load data
+
+Load data from excel file, process it and convert it to be time series data frame `tsibble` object.
+
+```{r}
+electric_consumption <- 
+  read_excel("data/J04.xlsx", skip = 1) |> 
+  mutate(year = as.numeric(str_sub(`Y/Q`, 1, 4))) |> 
+  fill(year, .direction = "down") |> 
+  group_by(year) |> 
+  mutate(quarter = row_number()) |> 
+  ungroup() |> 
+  mutate(year_quarter = make_yearquarter(year, quarter)) |> 
+  select(year_quarter, consumption) |> 
+  as_tsibble(index = year_quarter)
+
+electric_consumption
+```
+
+Visualize the series.
+
+```{r}
+electric_consumption |> 
+  autoplot(consumption)
+```
+
+
+### Train/test split
+
+```{r}
+electric_consumption_train <- 
+  electric_consumption |> 
+  filter(year(year_quarter) <= 2015)
+
+electric_consumption_test <- 
+  electric_consumption |> 
+  filter(year(year_quarter) > 2015)
+```
+
+### Detrend training data
+
+```{r}
+m <- 4
+
+detrended <-
+  electric_consumption_train |> 
+  mutate(
+    trend = slider::slide_mean(consumption, before = 2, after = 1, complete = TRUE),
+    trend = slider::slide_mean(trend, before = 0, after = 1, complete = TRUE),
+    detrended = consumption - trend
+  )
+
+detrended
+```
+
+### Deseasonalize data
+
+```{r}
+seasonality <- 
+  detrended |> 
+  as_tibble() |> 
+  mutate(quarter = quarter(year_quarter)) |> 
+  group_by(quarter) |> 
+  summarize(s = mean(detrended, na.rm = TRUE)) |> 
+  mutate(s = s - mean(s)) |> 
+  pull(s)
+
+seasonality
+```
+
+```{r}
+deseasonalized <- 
+  detrended |> 
+  mutate(
+    seasonal = seasonality[quarter(year_quarter)],
+    deseasonalized = consumption - seasonal,
+    random = consumption - trend - seasonal
+  )
+
+deseasonalized
+```
+
+
+### Use `feasts::classical_decomposition()`
+
+`classical_decomposition()` from `{feasts}` package is a short cut to decompose a series into trend, seasonality and random components. Find additional explanation from [Forecasting: Principles and Practice](https://otexts.com/fpp3/classical-decomposition.html) by Rob J Hyndman and George Athanasopoulos.
+
+First, call `classical_decomposition()` inside `model()` function. The `model()` function returns `mable` object, which stands for "model table".
+
+```{r}
+electric_consumption_decomposition <- 
+  electric_consumption_train |> 
+  model(classical_decomposition(consumption))
+
+electric_consumption_decomposition
+```
+
+To see series of each component, call `components()`. This function returns `dable` object, which stands for "decomposition table".
+
+`trend`, `seasonal`, and `random` columns represent trend, seasonality, and random component, respectively. `season_adjust` represents the deseasonalized series.
+
+```{r}
+electric_consumption_decomposition |> 
+  components()
+```
+
+Visualize the components.
+
+```{r}
+electric_consumption_decomposition |> 
+  components() |> 
+  autoplot()
+```
+
+
+
+### Forecast
+
+Use the deseasonalized series to produce a forecast.
+
+```{r}
+fit_poly <- 
+  deseasonalized |> 
+  mutate(t = row_number()) |> 
+  lm(deseasonalized ~ t + I(t^2), data = _)
+
+broom::tidy(fit_poly)
+```
+
+Create forecast for two years.
+
+```{r}
+electric_consumption_test <- 
+  electric_consumption_test |> 
+  mutate(t = nrow(electric_consumption_train) + row_number())
+  
+electric_consumption_test |> 
+  mutate(
+    forecast_trend = predict(fit_poly, newdata = electric_consumption_test),
+    forecast_seasonality = seasonality[quarter(year_quarter)],
+    forecast = forecast_trend + forecast_seasonality,
+    forecast_error = consumption - forecast
+  )
+```
+
