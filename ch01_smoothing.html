@@ -244,6 +244,16 @@ window.Quarto = {
   <li><a href="#use-feastsclassical_decomposition-1" id="toc-use-feastsclassical_decomposition-1" class="nav-link" data-scroll-target="#use-feastsclassical_decomposition-1"><span class="header-section-number">1.6.4</span> Use <code>feasts::classical_decomposition()</code></a></li>
   <li><a href="#forecast-2" id="toc-forecast-2" class="nav-link" data-scroll-target="#forecast-2"><span class="header-section-number">1.6.5</span> Forecast</a></li>
   </ul></li>
+  <li><a href="#example-1.8" id="toc-example-1.8" class="nav-link" data-scroll-target="#example-1.8"><span class="header-section-number">1.7</span> Example 1.8</a></li>
+  <li><a href="#example-1.9" id="toc-example-1.9" class="nav-link" data-scroll-target="#example-1.9"><span class="header-section-number">1.8</span> Example 1.9</a>
+  <ul class="collapse">
+  <li><a href="#load-data-5" id="toc-load-data-5" class="nav-link" data-scroll-target="#load-data-5"><span class="header-section-number">1.8.1</span> Load data</a></li>
+  <li><a href="#time-series-cross-validation" id="toc-time-series-cross-validation" class="nav-link" data-scroll-target="#time-series-cross-validation"><span class="header-section-number">1.8.2</span> Time series cross-validation</a></li>
+  <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models"><span class="header-section-number">1.8.3</span> Models</a></li>
+  <li><a href="#forecast-3" id="toc-forecast-3" class="nav-link" data-scroll-target="#forecast-3"><span class="header-section-number">1.8.4</span> Forecast</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation"><span class="header-section-number">1.8.5</span> Evaluation</a></li>
+  <li><a href="#multiple-models" id="toc-multiple-models" class="nav-link" data-scroll-target="#multiple-models"><span class="header-section-number">1.8.6</span> Multiple models</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -1265,12 +1275,15 @@ Model: ETS(A,A,N)
 <span id="cb89-19"><a href="#cb89-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(year_month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_ts_test <span class="sc">|&gt;</span> </span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">k =</span> year_month <span class="sc">-</span> month_latest,</span>
-<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast =</span> (l_latest <span class="sc">+</span> b_latest <span class="sc">*</span> k) <span class="sc">*</span> s_latest[(k <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%%</span> m <span class="sc">+</span> <span class="dv">1</span>],</span>
-<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast_error =</span> consumption <span class="sc">-</span> forecast</span>
-<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_winters_forecast <span class="ot">&lt;-</span> </span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  gas_consumption_ts_test <span class="sc">|&gt;</span> </span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">k =</span> year_month <span class="sc">-</span> month_latest,</span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast =</span> (l_latest <span class="sc">+</span> b_latest <span class="sc">*</span> k) <span class="sc">*</span> s_latest[(k <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%%</span> m <span class="sc">+</span> <span class="dv">1</span>],</span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">forecast_error =</span> consumption <span class="sc">-</span> forecast</span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>gas_consumption_winters_forecast</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tsibble: 12 x 5 [1M]
    year_month consumption     k forecast forecast_error
@@ -1916,6 +1929,236 @@ Caused by warning:
 6      2017 Q2        3789    82 4126.       0.929    3834.          -44.5
 7      2017 Q3        4448    83 4128.       1.01     4155.          293. 
 8      2017 Q4        4088    84 4129.       0.961    3966.          122. </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="example-1.8" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="example-1.8"><span class="header-section-number">1.7</span> Example 1.8</h2>
+<p><code>{fabletools}</code> package that is automatically loaded along with <code>{fable}</code> provides forecast accuracy evaluation functions.</p>
+<p>Let us evaluate 1-year forecast accuracy from Example 1.5. (Book example evaluated for 2 years, but here we will see only 1-year forecast.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MSE</span>(gas_consumption_winters_forecast<span class="sc">$</span>forecast_error)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 14585.48</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">RMSE</span>(gas_consumption_winters_forecast<span class="sc">$</span>forecast_error)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 120.7704</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MAE</span>(gas_consumption_winters_forecast<span class="sc">$</span>forecast_error)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 71.72264</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MAPE</span>(gas_consumption_winters_forecast<span class="sc">$</span>forecast_error, gas_consumption_winters_forecast<span class="sc">$</span>consumption)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7.033255</code></pre>
+</div>
+</div>
+</section>
+<section id="example-1.9" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="example-1.9"><span class="header-section-number">1.8</span> Example 1.9</h2>
+<section id="load-data-5" class="level3" data-number="1.8.1">
+<h3 data-number="1.8.1" class="anchored" data-anchor-id="load-data-5"><span class="header-section-number">1.8.1</span> Load data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a>patent_ts <span class="ot">&lt;-</span> </span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"data/J02.xlsx"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">cnt =</span> <span class="st">`</span><span class="at">#patents</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb156-4"><a href="#cb156-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="time-series-cross-validation" class="level3" data-number="1.8.2">
+<h3 data-number="1.8.2" class="anchored" data-anchor-id="time-series-cross-validation"><span class="header-section-number">1.8.2</span> Time series cross-validation</h3>
+<p>To create one-step forecast in historical data, you need to set up time series cross-validation. Great explanation is provided in <a href="https://otexts.com/fpp3/tscv.html">Forecasting: Principles and Practice</a> by Rob J Hyndman and George Athanasopoulos.</p>
+<p>Call <code>stretch_tsibble()</code> to construct time series cross-validation that each training set is defined by <code>.id</code>, which is used as a key in the output <code>tsibble</code> object. Apply <code>filter(.id != max(.id))</code> to exclude the last set that entire data is used as training data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>patent_cv <span class="ot">&lt;-</span> </span>
+<span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a>  patent_ts <span class="sc">|&gt;</span> </span>
+<span id="cb157-3"><a href="#cb157-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stretch_tsibble</span>(<span class="at">.step =</span> <span class="dv">1</span>, <span class="at">.init =</span> <span class="dv">7</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb157-4"><a href="#cb157-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.id <span class="sc">!=</span> <span class="fu">max</span>(.id))</span>
+<span id="cb157-5"><a href="#cb157-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb157-6"><a href="#cb157-6" aria-hidden="true" tabindex="-1"></a>patent_cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 255 x 3 [1Y]
+# Key:       .id [17]
+    year   cnt   .id
+   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1  1993  21.5     1
+ 2  1994  28.6     1
+ 3  1995  59.2     1
+ 4  1996  68.4     1
+ 5  1997  67.3     1
+ 6  1998  50.6     1
+ 7  1999  56       1
+ 8  1993  21.5     2
+ 9  1994  28.6     2
+10  1995  59.2     2
+# ℹ 245 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="models" class="level3" data-number="1.8.3">
+<h3 data-number="1.8.3" class="anchored" data-anchor-id="models"><span class="header-section-number">1.8.3</span> Models</h3>
+<p>Let us use Holt’s linear method with optimized initialization and smoothing parameters. As a result, it will return one model object per each cross-validation set.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a>fit_cv <span class="ot">&lt;-</span> </span>
+<span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a>  patent_cv <span class="sc">|&gt;</span> </span>
+<span id="cb159-3"><a href="#cb159-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb159-4"><a href="#cb159-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Holt =</span> <span class="fu">ETS</span>(cnt <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="st">"N"</span>))</span>
+<span id="cb159-5"><a href="#cb159-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb159-6"><a href="#cb159-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb159-7"><a href="#cb159-7" aria-hidden="true" tabindex="-1"></a>fit_cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 17 x 2
+# Key:     .id [17]
+     .id         Holt
+   &lt;int&gt;      &lt;model&gt;
+ 1     1 &lt;ETS(A,A,N)&gt;
+ 2     2 &lt;ETS(A,A,N)&gt;
+ 3     3 &lt;ETS(A,A,N)&gt;
+ 4     4 &lt;ETS(A,A,N)&gt;
+ 5     5 &lt;ETS(A,A,N)&gt;
+ 6     6 &lt;ETS(A,A,N)&gt;
+ 7     7 &lt;ETS(A,A,N)&gt;
+ 8     8 &lt;ETS(A,A,N)&gt;
+ 9     9 &lt;ETS(A,A,N)&gt;
+10    10 &lt;ETS(A,A,N)&gt;
+11    11 &lt;ETS(A,A,N)&gt;
+12    12 &lt;ETS(A,A,N)&gt;
+13    13 &lt;ETS(A,A,N)&gt;
+14    14 &lt;ETS(A,A,N)&gt;
+15    15 &lt;ETS(A,A,N)&gt;
+16    16 &lt;ETS(A,A,N)&gt;
+17    17 &lt;ETS(A,A,N)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="forecast-3" class="level3" data-number="1.8.4">
+<h3 data-number="1.8.4" class="anchored" data-anchor-id="forecast-3"><span class="header-section-number">1.8.4</span> Forecast</h3>
+<p>Call <code>forecast(h = 1)</code> to produce one-step forecast for each model in the <code>mable</code> object. As a result, it returns a <code>fable</code> object, forecast table, that each row represents each cross validation set and column <code>.mean</code> represents the point forecast.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a>fc_cv <span class="ot">&lt;-</span> </span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true" tabindex="-1"></a>  fit_cv <span class="sc">|&gt;</span> </span>
+<span id="cb161-3"><a href="#cb161-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
+<span id="cb161-4"><a href="#cb161-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-5"><a href="#cb161-5" aria-hidden="true" tabindex="-1"></a>fc_cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A fable: 17 x 5 [1Y]
+# Key:     .id, .model [17]
+     .id .model  year         cnt .mean
+   &lt;int&gt; &lt;chr&gt;  &lt;dbl&gt;      &lt;dist&gt; &lt;dbl&gt;
+ 1     1 Holt    2000  N(72, 388)  72.4
+ 2     2 Holt    2001  N(78, 291)  78.0
+ 3     3 Holt    2002  N(82, 235)  81.6
+ 4     4 Holt    2003  N(85, 199)  84.8
+ 5     5 Holt    2004  N(91, 174)  91.4
+ 6     6 Holt    2005 N(100, 172)  99.9
+ 7     7 Holt    2006 N(110, 198) 110. 
+ 8     8 Holt    2007 N(133, 169) 133. 
+ 9     9 Holt    2008 N(136, 160) 136. 
+10    10 Holt    2009 N(135, 139) 135. 
+11    11 Holt    2010 N(135, 133) 135. 
+12    12 Holt    2011 N(139, 125) 139. 
+13    13 Holt    2012 N(146, 117) 146. 
+14    14 Holt    2013 N(156, 109) 156. 
+15    15 Holt    2014 N(168, 104) 168. 
+16    16 Holt    2015  N(172, 99) 172. 
+17    17 Holt    2016  N(175, 94) 175. </code></pre>
+</div>
+</div>
+</section>
+<section id="evaluation" class="level3" data-number="1.8.5">
+<h3 data-number="1.8.5" class="anchored" data-anchor-id="evaluation"><span class="header-section-number">1.8.5</span> Evaluation</h3>
+<p>Finally, evaluate accuracy by calling <code>accuracy()</code> function. It returns a data frame that a row represents a model and columns represent metrics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>fc_cv <span class="sc">|&gt;</span> </span>
+<span id="cb163-2"><a href="#cb163-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(patent_ts, <span class="at">measures =</span> <span class="fu">list</span>(<span class="at">MSE =</span> MSE, <span class="at">RMSE =</span> RMSE, <span class="at">MAE =</span> MAE, <span class="at">MAPE =</span> MAPE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 6
+  .model .type   MSE  RMSE   MAE  MAPE
+  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 Holt   Test   79.9  8.94  6.95  5.80</code></pre>
+</div>
+</div>
+<p>The performance is better than the book example, because of optimal smoothing paramters and initialization.</p>
+</section>
+<section id="multiple-models" class="level3" data-number="1.8.6">
+<h3 data-number="1.8.6" class="anchored" data-anchor-id="multiple-models"><span class="header-section-number">1.8.6</span> Multiple models</h3>
+<p>You can compare multiple models by adding more models in <code>model()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a>fit_cv <span class="ot">&lt;-</span> </span>
+<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a>  patent_cv <span class="sc">|&gt;</span> </span>
+<span id="cb165-3"><a href="#cb165-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb165-4"><a href="#cb165-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Holt =</span> <span class="fu">ETS</span>(cnt <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="st">"N"</span>)),</span>
+<span id="cb165-5"><a href="#cb165-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Mean =</span> <span class="fu">MEAN</span>(cnt),</span>
+<span id="cb165-6"><a href="#cb165-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Naive =</span> <span class="fu">NAIVE</span>(cnt),</span>
+<span id="cb165-7"><a href="#cb165-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">TSLM</span>(cnt <span class="sc">~</span> <span class="fu">trend</span>()),</span>
+<span id="cb165-8"><a href="#cb165-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">theta =</span> <span class="fu">THETA</span>(cnt, <span class="at">method =</span> <span class="st">"additive"</span>)</span>
+<span id="cb165-9"><a href="#cb165-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb165-10"><a href="#cb165-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb165-11"><a href="#cb165-11" aria-hidden="true" tabindex="-1"></a>fit_cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 17 x 6
+# Key:     .id [17]
+     .id         Holt    Mean   Naive      lm   theta
+   &lt;int&gt;      &lt;model&gt; &lt;model&gt; &lt;model&gt; &lt;model&gt; &lt;model&gt;
+ 1     1 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 2     2 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 3     3 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 4     4 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 5     5 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 6     6 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 7     7 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 8     8 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+ 9     9 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+10    10 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+11    11 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+12    12 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+13    13 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+14    14 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+15    15 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+16    16 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;
+17    17 &lt;ETS(A,A,N)&gt;  &lt;MEAN&gt; &lt;NAIVE&gt;  &lt;TSLM&gt; &lt;THETA&gt;</code></pre>
+</div>
+</div>
+<p>Now, each combination of cross-validation set and forecast model shows one-step forecast.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a>fc_cv <span class="ot">&lt;-</span> </span>
+<span id="cb167-2"><a href="#cb167-2" aria-hidden="true" tabindex="-1"></a>  fit_cv <span class="sc">|&gt;</span> </span>
+<span id="cb167-3"><a href="#cb167-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
+<span id="cb167-4"><a href="#cb167-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-5"><a href="#cb167-5" aria-hidden="true" tabindex="-1"></a>fc_cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A fable: 85 x 5 [1Y]
+# Key:     .id, .model [85]
+     .id .model  year        cnt .mean
+   &lt;int&gt; &lt;chr&gt;  &lt;dbl&gt;     &lt;dist&gt; &lt;dbl&gt;
+ 1     1 Holt    2000 N(72, 388)  72.4
+ 2     1 Mean    2000 N(50, 386)  50.2
+ 3     1 Naive   2000 N(56, 230)  56  
+ 4     1 lm      2000 N(72, 399)  72.5
+ 5     1 theta   2000 N(59, 276)  58.8
+ 6     2 Holt    2001 N(78, 291)  78.0
+ 7     2 Mean    2001 N(53, 398)  53.0
+ 8     2 Naive   2001 N(73, 238)  72.8
+ 9     2 lm      2001 N(78, 312)  78.2
+10     2 theta   2001 N(76, 277)  75.6
+# ℹ 75 more rows</code></pre>
+</div>
+</div>
+<p>And you can compare models based on forecast accuracy metrics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>fc_cv <span class="sc">|&gt;</span> </span>
+<span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(patent_ts, <span class="at">measures =</span> <span class="fu">list</span>(<span class="at">MSE =</span> MSE, <span class="at">RMSE =</span> RMSE, <span class="at">MAE =</span> MAE, <span class="at">MAPE =</span> MAPE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 6
+  .model .type    MSE  RMSE   MAE  MAPE
+  &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 Holt   Test    79.9  8.94  6.95  5.80
+2 Mean   Test  2729.  52.2  49.7  38.9 
+3 Naive  Test    79.9  8.94  6.96  6.28
+4 lm     Test    77.4  8.80  7.12  5.93
+5 theta  Test    52.8  7.27  5.31  4.86</code></pre>
 </div>
 </div>
 
