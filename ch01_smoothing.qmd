@@ -628,12 +628,15 @@ month_latest <-
 
 
 ```{r}
-gas_consumption_ts_test |> 
+gas_consumption_winters_forecast <- 
+  gas_consumption_ts_test |> 
   mutate(
     k = year_month - month_latest,
     forecast = (l_latest + b_latest * k) * s_latest[(k - 1) %% m + 1],
     forecast_error = consumption - forecast
   )
+
+gas_consumption_winters_forecast
 ```
 
 
@@ -991,3 +994,119 @@ electric_consumption_test |>
   )
 ```
 
+
+## Example 1.8
+
+`{fabletools}` package that is automatically loaded along with `{fable}` provides forecast accuracy evaluation functions.
+
+Let us evaluate 1-year forecast accuracy from Example 1.5. (Book example evaluated for 2 years, but here we will see only 1-year forecast.)
+
+```{r}
+MSE(gas_consumption_winters_forecast$forecast_error)
+RMSE(gas_consumption_winters_forecast$forecast_error)
+MAE(gas_consumption_winters_forecast$forecast_error)
+MAPE(gas_consumption_winters_forecast$forecast_error, gas_consumption_winters_forecast$consumption)
+```
+
+
+## Example 1.9
+
+### Load data
+
+```{r}
+patent_ts <- 
+  read_excel("data/J02.xlsx") |> 
+  rename(cnt = `#patents`) |> 
+  as_tsibble(index = year)
+```
+
+
+### Time series cross-validation
+
+To create one-step forecast in historical data, you need to set up time series cross-validation. Great explanation is provided in [Forecasting: Principles and Practice](https://otexts.com/fpp3/tscv.html) by Rob J Hyndman and George Athanasopoulos.
+
+Call `stretch_tsibble()` to construct time series cross-validation that each training set is defined by `.id`, which is used as a key in the output `tsibble` object. Apply `filter(.id != max(.id))` to exclude the last set that entire data is used as training data.
+
+```{r}
+patent_cv <- 
+  patent_ts |> 
+  stretch_tsibble(.step = 1, .init = 7) |> 
+  filter(.id != max(.id))
+
+patent_cv
+```
+
+### Models
+
+Let us use Holt's linear method with optimized initialization and smoothing parameters. As a result, it will return one model object per each cross-validation set.
+
+```{r}
+fit_cv <- 
+  patent_cv |> 
+  model(
+    Holt = ETS(cnt ~ error("A") + trend("A") + season("N"))
+  )
+
+fit_cv
+```
+
+
+### Forecast
+
+Call `forecast(h = 1)` to produce one-step forecast for each model in the `mable` object. As a result, it returns a `fable` object, forecast table, that each row represents each cross validation set and column `.mean` represents the point forecast.
+
+```{r}
+fc_cv <- 
+  fit_cv |> 
+  forecast(h = 1)
+
+fc_cv
+```
+
+
+### Evaluation
+
+Finally, evaluate accuracy by calling `accuracy()` function. It returns a data frame that a row represents a model and columns represent metrics.
+
+```{r}
+fc_cv |> 
+  accuracy(patent_ts, measures = list(MSE = MSE, RMSE = RMSE, MAE = MAE, MAPE = MAPE))
+```
+
+The performance is better than the book example, because of optimal smoothing paramters and initialization.
+
+
+### Multiple models
+
+You can compare multiple models by adding more models in `model()`.
+
+```{r}
+fit_cv <- 
+  patent_cv |> 
+  model(
+    Holt = ETS(cnt ~ error("A") + trend("A") + season("N")),
+    Mean = MEAN(cnt),
+    Naive = NAIVE(cnt),
+    lm = TSLM(cnt ~ trend()),
+    theta = THETA(cnt, method = "additive")
+  )
+
+fit_cv
+```
+
+Now, each combination of cross-validation set and forecast model shows one-step forecast.
+
+```{r}
+fc_cv <- 
+  fit_cv |> 
+  forecast(h = 1)
+
+fc_cv
+```
+
+And you can compare models based on forecast accuracy metrics.
+
+```{r}
+fc_cv |> 
+  accuracy(patent_ts, measures = list(MSE = MSE, RMSE = RMSE, MAE = MAE, MAPE = MAPE))
+```
