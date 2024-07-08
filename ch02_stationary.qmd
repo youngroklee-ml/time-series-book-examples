@@ -1,0 +1,78 @@
+# Stationary time series
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+```
+
+
+## Example 2.2
+
+### Load data
+
+```{r}
+earthquake <-
+  read_excel("data/J08.xlsx", skip = 1, n_max = 50) |>
+  mutate(year = year(year)) |>
+  as_tsibble(index = year)
+earthquake
+```
+
+### Sample mean and sample variance
+
+Sample size:
+
+```{r}
+n <- nrow(earthquake)
+```
+
+Sample mean: 
+
+```{r}
+z_bar <- mean(earthquake$numbers)
+z_bar
+```
+
+Sample variance:
+
+```{r}
+gamma_0 <- var(earthquake$numbers)
+gamma_0
+```
+
+### Autocorrelation function
+
+Use `n - 1` as denominator for covariance.
+
+```{r}
+rho <- map_dbl(
+  1:10,
+  \(k) sum((earthquake$numbers[(k+1):n] - z_bar) * 
+           (earthquake$numbers[1:(n-k)] - z_bar)) / 
+           (n - 1) / gamma_0
+)
+rho
+```
+
+### Use `stats::acf()`
+
+`{stats}`, one of R's core package, provides `acf()` function to compute autocorrelation.
+
+```{r}
+acf_results <- acf(earthquake$numbers, type = "correlation", plot = FALSE, lag.max = 10)
+acf_results
+```
+
+
+### Use `feasts::ACF()`
+
+`{feasts}`, a part of tidyverts framework, provide `ACF()` function to compute autocorrelation on `tsibble` object.
+
+```{r}
+earthquake |> 
+  ACF(numbers, lag_max = 10)
+```
+
