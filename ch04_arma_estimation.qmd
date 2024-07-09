@@ -1,0 +1,123 @@
+# ARMA identification and estimation
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+```
+
+## Example 4.1
+
+### Data
+
+```{r}
+ts <- 
+  tsibble(
+    t = 1:15,
+    value = c(-1.01, -0.81, -0.33, -0.40, -0.95, -1.33, 0.72, 0.63,
+               1.30, 1.08, -0.33, 0.31, 0.10, -0.41, -0.22),
+    index = t
+  )
+```
+
+### ACF
+
+```{r}
+ts |> 
+  ACF(value)
+```
+
+### PACF
+
+```{r}
+ts |> 
+  PACF(value)
+```
+
+
+## Examples 4.2, 4.7 - 4.8
+
+### Load data
+
+```{r}
+nile_flow <- read_excel(
+  "data/J09.xlsx", 
+  n_max = 99, 
+  .name_repair = janitor::make_clean_names
+) |> 
+  mutate(year = 1872:1970) |> 
+  as_tsibble(index = year)
+```
+
+
+```{r}
+nile_flow |> 
+  autoplot(mean_flow)
+```
+
+
+### Ex 4.2: Model identification
+
+#### ACF
+
+```{r}
+nile_flow |> 
+  ACF(mean_flow) |> 
+  autoplot()
+```
+
+#### PACF
+
+```{r}
+nile_flow |> 
+  PACF(mean_flow) |> 
+  autoplot()
+```
+
+
+### Ex 4.7: Model estimation
+
+Use `AR()` from `{fable}` package. In formula, use `order(2)` set the order of auto-regressive term to be 2.
+
+```{r}
+ar_fit <- 
+  nile_flow |> 
+  model(AR = AR(mean_flow ~ order(2)))
+
+ar_fit
+```
+
+:::{.callout-note}
+Use `order()` without argument if you want to let the order of auto-regressive term to be optimized based on information criterion.
+:::
+
+
+See the estimated model.
+
+```{r}
+report(ar_fit)
+```
+
+See more detailed statistics of the regression coefficients.
+
+```{r}
+tidy(ar_fit)
+```
+
+See model-level statistics.
+
+```{r}
+glance(ar_fit)
+```
+
+
+### Ex 4.8: Residual diagnostics
+
+```{r}
+ar_fit |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 12)
+```
+

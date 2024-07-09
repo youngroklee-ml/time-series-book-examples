@@ -9,6 +9,8 @@ book:
     - index.qmd
     - ch01_smoothing.qmd
     - ch02_stationary.qmd
+    - ch03_arma_model.qmd
+    - ch04_arma_estimation.qmd
   repo-url: https://github.com/youngroklee-ml/time-series-book-examples
 
 format:
