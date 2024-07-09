@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Examples in Time Series Analysis and Application - 2&nbsp; Stationary time series</title>
+<title>Examples in Time Series Analysis and Application - 4&nbsp; ARMA identification and estimation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./ch03_arma_model.html" rel="next">
-<link href="./ch01_smoothing.html" rel="prev">
+<link href="./ch03_arma_model.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -115,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch02_stationary.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Stationary time series</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch04_arma_estimation.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">ARMA identification and estimation</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -157,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ch02_stationary.html" class="sidebar-item-text sidebar-link active">
+  <a href="./ch02_stationary.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Stationary time series</span></span></a>
   </div>
 </li>
@@ -169,7 +168,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ch04_arma_estimation.html" class="sidebar-item-text sidebar-link">
+  <a href="./ch04_arma_estimation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">ARMA identification and estimation</span></span></a>
   </div>
 </li>
@@ -183,12 +182,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#examples-2.2-2.4" id="toc-examples-2.2-2.4" class="nav-link active" data-scroll-target="#examples-2.2-2.4"><span class="header-section-number">2.1</span> Examples 2.2, 2.4</a>
+  <li><a href="#example-4.1" id="toc-example-4.1" class="nav-link active" data-scroll-target="#example-4.1"><span class="header-section-number">4.1</span> Example 4.1</a>
   <ul class="collapse">
-  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data"><span class="header-section-number">2.1.1</span> Load data</a></li>
-  <li><a href="#sample-mean-and-sample-variance" id="toc-sample-mean-and-sample-variance" class="nav-link" data-scroll-target="#sample-mean-and-sample-variance"><span class="header-section-number">2.1.2</span> Sample mean and sample variance</a></li>
-  <li><a href="#ex-2.2-autocorrelation-function" id="toc-ex-2.2-autocorrelation-function" class="nav-link" data-scroll-target="#ex-2.2-autocorrelation-function"><span class="header-section-number">2.1.3</span> Ex 2.2: Autocorrelation function</a></li>
-  <li><a href="#ex-2.4-partial-autocorrelation-function" id="toc-ex-2.4-partial-autocorrelation-function" class="nav-link" data-scroll-target="#ex-2.4-partial-autocorrelation-function"><span class="header-section-number">2.1.4</span> Ex 2.4: Partial autocorrelation function</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">4.1.1</span> Data</a></li>
+  <li><a href="#acf" id="toc-acf" class="nav-link" data-scroll-target="#acf"><span class="header-section-number">4.1.2</span> ACF</a></li>
+  <li><a href="#pacf" id="toc-pacf" class="nav-link" data-scroll-target="#pacf"><span class="header-section-number">4.1.3</span> PACF</a></li>
+  </ul></li>
+  <li><a href="#examples-4.2-4.7---4.8" id="toc-examples-4.2-4.7---4.8" class="nav-link" data-scroll-target="#examples-4.2-4.7---4.8"><span class="header-section-number">4.2</span> Examples 4.2, 4.7 - 4.8</a>
+  <ul class="collapse">
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data"><span class="header-section-number">4.2.1</span> Load data</a></li>
+  <li><a href="#ex-4.2-model-identification" id="toc-ex-4.2-model-identification" class="nav-link" data-scroll-target="#ex-4.2-model-identification"><span class="header-section-number">4.2.2</span> Ex 4.2: Model identification</a></li>
+  <li><a href="#ex-4.7-model-estimation" id="toc-ex-4.7-model-estimation" class="nav-link" data-scroll-target="#ex-4.7-model-estimation"><span class="header-section-number">4.2.3</span> Ex 4.7: Model estimation</a></li>
+  <li><a href="#ex-4.8-residual-diagnostics" id="toc-ex-4.8-residual-diagnostics" class="nav-link" data-scroll-target="#ex-4.8-residual-diagnostics"><span class="header-section-number">4.2.4</span> Ex 4.8: Residual diagnostics</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -198,7 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Stationary time series</span></h1>
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">ARMA identification and estimation</span></h1>
 </div>
 
 
@@ -252,203 +257,420 @@ The following objects are masked from 'package:base':
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(feasts)  <span class="co"># feature extraction, statistics, visualization for time series data</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="examples-2.2-2.4" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="examples-2.2-2.4"><span class="header-section-number">2.1</span> Examples 2.2, 2.4</h2>
-<section id="load-data" class="level3" data-number="2.1.1">
-<h3 data-number="2.1.1" class="anchored" data-anchor-id="load-data"><span class="header-section-number">2.1.1</span> Load data</h3>
+<section id="example-4.1" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="example-4.1"><span class="header-section-number">4.1</span> Example 4.1</h2>
+<section id="data" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="data"><span class="header-section-number">4.1.1</span> Data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="ot">&lt;-</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"data/J08.xlsx"</span>, <span class="at">skip =</span> <span class="dv">1</span>, <span class="at">n_max =</span> <span class="dv">50</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(year)) <span class="sc">|&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>earthquake</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tsibble</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">t =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.01</span>, <span class="sc">-</span><span class="fl">0.81</span>, <span class="sc">-</span><span class="fl">0.33</span>, <span class="sc">-</span><span class="fl">0.40</span>, <span class="sc">-</span><span class="fl">0.95</span>, <span class="sc">-</span><span class="fl">1.33</span>, <span class="fl">0.72</span>, <span class="fl">0.63</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>               <span class="fl">1.30</span>, <span class="fl">1.08</span>, <span class="sc">-</span><span class="fl">0.33</span>, <span class="fl">0.31</span>, <span class="fl">0.10</span>, <span class="sc">-</span><span class="fl">0.41</span>, <span class="sc">-</span><span class="fl">0.22</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">index =</span> t</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="acf" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="acf"><span class="header-section-number">4.1.2</span> ACF</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ts <span class="sc">|&gt;</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 50 x 2 [1Y]
-    year numbers
-   &lt;dbl&gt;   &lt;dbl&gt;
- 1  1949      36
- 2  1950      39
- 3  1951      21
- 4  1952      17
- 5  1953      22
- 6  1954      17
- 7  1955      19
- 8  1956      15
- 9  1957      34
-10  1958      10
-# ℹ 40 more rows</code></pre>
+<pre><code># A tsibble: 11 x 2 [1]
+        lag      acf
+   &lt;cf_lag&gt;    &lt;dbl&gt;
+ 1        1  0.480  
+ 2        2  0.160  
+ 3        3  0.0257 
+ 4        4 -0.154  
+ 5        5 -0.0968 
+ 6        6 -0.284  
+ 7        7 -0.323  
+ 8        8 -0.240  
+ 9        9 -0.0792 
+10       10  0.00431
+11       11 -0.0494 </code></pre>
 </div>
 </div>
 </section>
-<section id="sample-mean-and-sample-variance" class="level3" data-number="2.1.2">
-<h3 data-number="2.1.2" class="anchored" data-anchor-id="sample-mean-and-sample-variance"><span class="header-section-number">2.1.2</span> Sample mean and sample variance</h3>
-<p>Sample size:</p>
+<section id="pacf" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="pacf"><span class="header-section-number">4.1.3</span> PACF</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(earthquake)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Sample mean:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>z_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(earthquake<span class="sc">$</span>numbers)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>z_bar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ts <span class="sc">|&gt;</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 18.5</code></pre>
-</div>
-</div>
-<p>Sample variance:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>gamma_0 <span class="ot">&lt;-</span> <span class="fu">var</span>(earthquake<span class="sc">$</span>numbers)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gamma_0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 49.96939</code></pre>
-</div>
-</div>
-</section>
-<section id="ex-2.2-autocorrelation-function" class="level3" data-number="2.1.3">
-<h3 data-number="2.1.3" class="anchored" data-anchor-id="ex-2.2-autocorrelation-function"><span class="header-section-number">2.1.3</span> Ex 2.2: Autocorrelation function</h3>
-<p>Use <code>n - 1</code> as denominator for covariance.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">sum</span>((earthquake<span class="sc">$</span>numbers[(k<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>n] <span class="sc">-</span> z_bar) <span class="sc">*</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>           (earthquake<span class="sc">$</span>numbers[<span class="dv">1</span><span class="sc">:</span>(n<span class="sc">-</span>k)] <span class="sc">-</span> z_bar)) <span class="sc">/</span> </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>           (n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> gamma_0</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.39503778  0.31141515  0.26536655  0.21952216  0.15141924  0.08045742
- [7]  0.15754544  0.07392281 -0.10200123 -0.09250562</code></pre>
-</div>
-</div>
-<section id="use-statsacf" class="level4" data-number="2.1.3.1">
-<h4 data-number="2.1.3.1" class="anchored" data-anchor-id="use-statsacf"><span class="header-section-number">2.1.3.1</span> Use <code>stats::acf()</code></h4>
-<p><code>{stats}</code>, one of R’s core package, provides <code>acf()</code> function to compute autocorrelation.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>acf_results <span class="ot">&lt;-</span> <span class="fu">acf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">type =</span> <span class="st">"correlation"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> <span class="dv">10</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>acf_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Autocorrelations of series 'earthquake$numbers', by lag
-
-     0      1      2      3      4      5      6      7      8      9     10 
- 1.000  0.395  0.311  0.265  0.220  0.151  0.080  0.158  0.074 -0.102 -0.093 </code></pre>
-</div>
-</div>
-</section>
-<section id="use-feastsacf" class="level4" data-number="2.1.3.2">
-<h4 data-number="2.1.3.2" class="anchored" data-anchor-id="use-feastsacf"><span class="header-section-number">2.1.3.2</span> Use <code>feasts::ACF()</code></h4>
-<p><code>{feasts}</code>, a part of tidyverts framework, provide <code>ACF()</code> function to compute autocorrelation on <code>tsibble</code> object.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 10 x 2 [1Y]
-        lag     acf
+<pre><code># A tsibble: 11 x 2 [1]
+        lag    pacf
    &lt;cf_lag&gt;   &lt;dbl&gt;
- 1       1Y  0.395 
- 2       2Y  0.311 
- 3       3Y  0.265 
- 4       4Y  0.220 
- 5       5Y  0.151 
- 6       6Y  0.0805
- 7       7Y  0.158 
- 8       8Y  0.0739
- 9       9Y -0.102 
-10      10Y -0.0925</code></pre>
+ 1        1  0.480 
+ 2        2 -0.0906
+ 3        3 -0.0193
+ 4        4 -0.190 
+ 5        5  0.0871
+ 6        6 -0.348 
+ 7        7 -0.0503
+ 8        8 -0.116 
+ 9        9  0.156 
+10       10 -0.171 
+11       11 -0.0454</code></pre>
 </div>
 </div>
-<p>Visualize autocorrelation function.</p>
+</section>
+</section>
+<section id="examples-4.2-4.7---4.8" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="examples-4.2-4.7---4.8"><span class="header-section-number">4.2</span> Examples 4.2, 4.7 - 4.8</h2>
+<section id="load-data" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="load-data"><span class="header-section-number">4.2.1</span> Load data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/J09.xlsx"</span>, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_max =</span> <span class="dv">99</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">.name_repair =</span> janitor<span class="sc">::</span>make_clean_names</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">1872</span><span class="sc">:</span><span class="dv">1970</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A30 / R30C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A31 / R31C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A32 / R32C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A33 / R33C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A34 / R34C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A35 / R35C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A36 / R36C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A37 / R37C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A38 / R38C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A39 / R39C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A40 / R40C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A41 / R41C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A42 / R42C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A43 / R43C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A44 / R44C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A45 / R45C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A46 / R46C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A47 / R47C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A48 / R48C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A49 / R49C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A50 / R50C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A51 / R51C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A52 / R52C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A53 / R53C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A54 / R54C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A55 / R55C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A56 / R56C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A57 / R57C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A58 / R58C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A59 / R59C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A60 / R60C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A61 / R61C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A62 / R62C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A63 / R63C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A64 / R64C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A65 / R65C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A66 / R66C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A67 / R67C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A68 / R68C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A69 / R69C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A70 / R70C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A71 / R71C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A72 / R72C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A73 / R73C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A74 / R74C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A75 / R75C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A76 / R76C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A77 / R77C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A78 / R78C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A79 / R79C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A80 / R80C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A81 / R81C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A82 / R82C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A83 / R83C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A84 / R84C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A85 / R85C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A86 / R86C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A87 / R87C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A88 / R88C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A89 / R89C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A90 / R90C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A91 / R91C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A92 / R92C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A93 / R93C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A94 / R94C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A95 / R95C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A96 / R96C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A97 / R97C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A98 / R98C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A99 / R99C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A100 / R100C1: got a date</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(mean_flow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ch02_stationary_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ch04_arma_estimation_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="ex-4.2-model-identification" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="ex-4.2-model-identification"><span class="header-section-number">4.2.2</span> Ex 4.2: Model identification</h3>
+<section id="acf-1" class="level4" data-number="4.2.2.1">
+<h4 data-number="4.2.2.1" class="anchored" data-anchor-id="acf-1"><span class="header-section-number">4.2.2.1</span> ACF</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(mean_flow) <span class="sc">|&gt;</span> </span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch04_arma_estimation_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="pacf-1" class="level4" data-number="4.2.2.2">
+<h4 data-number="4.2.2.2" class="anchored" data-anchor-id="pacf-1"><span class="header-section-number">4.2.2.2</span> PACF</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(mean_flow) <span class="sc">|&gt;</span> </span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch04_arma_estimation_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
-<section id="ex-2.4-partial-autocorrelation-function" class="level3" data-number="2.1.4">
-<h3 data-number="2.1.4" class="anchored" data-anchor-id="ex-2.4-partial-autocorrelation-function"><span class="header-section-number">2.1.4</span> Ex 2.4: Partial autocorrelation function</h3>
+<section id="ex-4.7-model-estimation" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="ex-4.7-model-estimation"><span class="header-section-number">4.2.3</span> Ex 4.7: Model estimation</h3>
+<p>Use <code>AR()</code> from <code>{fable}</code> package. In formula, use <code>order(2)</code> set the order of auto-regressive term to be 2.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(acf_results<span class="sc">$</span>acf[<span class="dv">10</span><span class="sc">:</span><span class="dv">2</span>], acf_results<span class="sc">$</span>acf[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> acf_results<span class="sc">$</span>acf[<span class="dv">2</span><span class="sc">:</span><span class="dv">11</span>]</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reduce</span>(</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  \(m, i) <span class="fu">rbind</span>(m, x[(<span class="dv">10</span> <span class="sc">-</span> i) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)]),</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">.init =</span> x[<span class="dv">10</span><span class="sc">:</span><span class="dv">19</span>]</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">solve</span>(mat[<span class="dv">1</span><span class="sc">:</span>k, <span class="dv">1</span><span class="sc">:</span>k], y[<span class="dv">1</span><span class="sc">:</span>k])[k]</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>ar_fit <span class="ot">&lt;-</span> </span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="at">AR =</span> <span class="fu">AR</span>(mean_flow <span class="sc">~</span> <span class="fu">order</span>(<span class="dv">2</span>)))</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>ar_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.395037778  0.184088155  0.113167641  0.060683539 -0.004447767
- [6] -0.046903292  0.109748706 -0.035820889 -0.209890421 -0.061031590</code></pre>
+<pre><code># A mable: 1 x 1
+               AR
+          &lt;model&gt;
+1 &lt;AR(2) w/ mean&gt;</code></pre>
 </div>
 </div>
-<section id="use-statspacf" class="level4" data-number="2.1.4.1">
-<h4 data-number="2.1.4.1" class="anchored" data-anchor-id="use-statspacf"><span class="header-section-number">2.1.4.1</span> Use <code>stats::pacf()</code></h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>order()</code> without argument if you want to let the order of auto-regressive term to be optimized based on information criterion.</p>
+</div>
+</div>
+<p>See the estimated model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pacf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">lag.max =</span> <span class="dv">10</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span>(ar_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>
-Partial autocorrelations of series 'earthquake$numbers', by lag
+<pre><code>Series: mean_flow 
+Model: AR(2) w/ mean 
 
-     1      2      3      4      5      6      7      8      9     10 
- 0.395  0.184  0.113  0.061 -0.004 -0.047  0.110 -0.036 -0.210 -0.061 </code></pre>
+Coefficients:
+  constant     ar1     ar2
+  360.5505  0.4011  0.2021
+
+sigma^2 estimated as 20322
+AIC = -27.53    AICc = -27.28   BIC = -19.75</code></pre>
+</div>
+</div>
+<p>See more detailed statistics of the regression coefficients.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(ar_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  .model term     estimate std.error statistic  p.value
+  &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 AR     constant  361.      93.3         3.86 0.000202
+2 AR     ar1         0.401    0.0994      4.03 0.000110
+3 AR     ar2         0.202    0.0991      2.04 0.0443  </code></pre>
+</div>
+</div>
+<p>See model-level statistics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(ar_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 6
+  .model sigma2   AIC  AICc   BIC   dof
+  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+1 AR     20322. -27.5 -27.3 -19.7    96</code></pre>
 </div>
 </div>
 </section>
-<section id="use-feastspacf" class="level4" data-number="2.1.4.2">
-<h4 data-number="2.1.4.2" class="anchored" data-anchor-id="use-feastspacf"><span class="header-section-number">2.1.4.2</span> Use <code>feasts::PACF()</code></h4>
+<section id="ex-4.8-residual-diagnostics" class="level3" data-number="4.2.4">
+<h3 data-number="4.2.4" class="anchored" data-anchor-id="ex-4.8-residual-diagnostics"><span class="header-section-number">4.2.4</span> Ex 4.8: Residual diagnostics</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>ar_fit <span class="sc">|&gt;</span> </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(.innov, ljung_box, <span class="at">lag =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 10 x 2 [1Y]
-        lag     pacf
-   &lt;cf_lag&gt;    &lt;dbl&gt;
- 1       1Y  0.395  
- 2       2Y  0.184  
- 3       3Y  0.113  
- 4       4Y  0.0607 
- 5       5Y -0.00445
- 6       6Y -0.0469 
- 7       7Y  0.110  
- 8       8Y -0.0358 
- 9       9Y -0.210  
-10      10Y -0.0610 </code></pre>
-</div>
-</div>
-<p>Visualize partial autocorrelation function.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 10 x 2 [1Y]
-        lag     pacf
-   &lt;cf_lag&gt;    &lt;dbl&gt;
- 1       1Y  0.395  
- 2       2Y  0.184  
- 3       3Y  0.113  
- 4       4Y  0.0607 
- 5       5Y -0.00445
- 6       6Y -0.0469 
- 7       7Y  0.110  
- 8       8Y -0.0358 
- 9       9Y -0.210  
-10      10Y -0.0610 </code></pre>
+<pre><code># A tibble: 1 × 3
+  .model lb_stat lb_pvalue
+  &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 AR        11.5     0.488</code></pre>
 </div>
 </div>
 
 
-</section>
 </section>
 </section>
 
@@ -864,14 +1086,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./ch01_smoothing.html" class="pagination-link" aria-label="Smoothing">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Smoothing</span></span>
+      <a href="./ch03_arma_model.html" class="pagination-link" aria-label="ARMA model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">ARMA model</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./ch03_arma_model.html" class="pagination-link" aria-label="ARMA model">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">ARMA model</span></span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
