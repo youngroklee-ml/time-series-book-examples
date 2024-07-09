@@ -9,7 +9,7 @@ library(readxl)
 ```
 
 
-## Example 2.2
+## Examples 2.2, 2.4
 
 ### Load data
 
@@ -43,7 +43,7 @@ gamma_0 <- var(earthquake$numbers)
 gamma_0
 ```
 
-### Autocorrelation function
+### Ex 2.2: Autocorrelation function
 
 Use `n - 1` as denominator for covariance.
 
@@ -57,7 +57,7 @@ rho <- map_dbl(
 rho
 ```
 
-### Use `stats::acf()`
+#### Use `stats::acf()`
 
 `{stats}`, one of R's core package, provides `acf()` function to compute autocorrelation.
 
@@ -67,12 +67,44 @@ acf_results
 ```
 
 
-### Use `feasts::ACF()`
+#### Use `feasts::ACF()`
 
 `{feasts}`, a part of tidyverts framework, provide `ACF()` function to compute autocorrelation on `tsibble` object.
 
 ```{r}
 earthquake |> 
   ACF(numbers, lag_max = 10)
+```
+
+
+### Ex 2.4: Partial autocorrelation function
+
+```{r}
+x <- c(acf_results$acf[10:2], acf_results$acf[1:10])
+y <- acf_results$acf[2:11]
+
+mat <- reduce(
+  2:10,
+  \(m, i) rbind(m, x[(10 - i) + (1:10)]),
+  .init = x[10:19]
+)
+
+map_dbl(
+  1:10,
+  \(k) solve(mat[1:k, 1:k], y[1:k])[k]
+)
+```
+
+#### Use `stats::pacf()`
+
+```{r}
+pacf(earthquake$numbers, lag.max = 10, plot = FALSE)
+```
+
+#### Use `feasts::PACF()`
+
+```{r}
+earthquake |> 
+  PACF(numbers, lag_max = 10)
 ```
 
