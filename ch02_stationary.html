@@ -170,13 +170,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#example-2.2" id="toc-example-2.2" class="nav-link active" data-scroll-target="#example-2.2"><span class="header-section-number">2.1</span> Example 2.2</a>
+  <li><a href="#examples-2.2-2.4" id="toc-examples-2.2-2.4" class="nav-link active" data-scroll-target="#examples-2.2-2.4"><span class="header-section-number">2.1</span> Examples 2.2, 2.4</a>
   <ul class="collapse">
   <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data"><span class="header-section-number">2.1.1</span> Load data</a></li>
   <li><a href="#sample-mean-and-sample-variance" id="toc-sample-mean-and-sample-variance" class="nav-link" data-scroll-target="#sample-mean-and-sample-variance"><span class="header-section-number">2.1.2</span> Sample mean and sample variance</a></li>
-  <li><a href="#autocorrelation-function" id="toc-autocorrelation-function" class="nav-link" data-scroll-target="#autocorrelation-function"><span class="header-section-number">2.1.3</span> Autocorrelation function</a></li>
-  <li><a href="#use-statsacf" id="toc-use-statsacf" class="nav-link" data-scroll-target="#use-statsacf"><span class="header-section-number">2.1.4</span> Use <code>stats::acf()</code></a></li>
-  <li><a href="#use-feastsacf" id="toc-use-feastsacf" class="nav-link" data-scroll-target="#use-feastsacf"><span class="header-section-number">2.1.5</span> Use <code>feasts::ACF()</code></a></li>
+  <li><a href="#ex-2.2-autocorrelation-function" id="toc-ex-2.2-autocorrelation-function" class="nav-link" data-scroll-target="#ex-2.2-autocorrelation-function"><span class="header-section-number">2.1.3</span> Ex 2.2: Autocorrelation function</a></li>
+  <li><a href="#ex-2.4-partial-autocorrelation-function" id="toc-ex-2.4-partial-autocorrelation-function" class="nav-link" data-scroll-target="#ex-2.4-partial-autocorrelation-function"><span class="header-section-number">2.1.4</span> Ex 2.4: Partial autocorrelation function</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -240,8 +239,8 @@ The following objects are masked from 'package:base':
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(feasts)  <span class="co"># feature extraction, statistics, visualization for time series data</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="example-2.2" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="example-2.2"><span class="header-section-number">2.1</span> Example 2.2</h2>
+<section id="examples-2.2-2.4" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="examples-2.2-2.4"><span class="header-section-number">2.1</span> Examples 2.2, 2.4</h2>
 <section id="load-data" class="level3" data-number="2.1.1">
 <h3 data-number="2.1.1" class="anchored" data-anchor-id="load-data"><span class="header-section-number">2.1.1</span> Load data</h3>
 <div class="cell">
@@ -291,8 +290,8 @@ The following objects are masked from 'package:base':
 </div>
 </div>
 </section>
-<section id="autocorrelation-function" class="level3" data-number="2.1.3">
-<h3 data-number="2.1.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">2.1.3</span> Autocorrelation function</h3>
+<section id="ex-2.2-autocorrelation-function" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="ex-2.2-autocorrelation-function"><span class="header-section-number">2.1.3</span> Ex 2.2: Autocorrelation function</h3>
 <p>Use <code>n - 1</code> as denominator for covariance.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
@@ -307,9 +306,8 @@ The following objects are masked from 'package:base':
  [7]  0.15754544  0.07392281 -0.10200123 -0.09250562</code></pre>
 </div>
 </div>
-</section>
-<section id="use-statsacf" class="level3" data-number="2.1.4">
-<h3 data-number="2.1.4" class="anchored" data-anchor-id="use-statsacf"><span class="header-section-number">2.1.4</span> Use <code>stats::acf()</code></h3>
+<section id="use-statsacf" class="level4" data-number="2.1.3.1">
+<h4 data-number="2.1.3.1" class="anchored" data-anchor-id="use-statsacf"><span class="header-section-number">2.1.3.1</span> Use <code>stats::acf()</code></h4>
 <p><code>{stats}</code>, one of R’s core package, provides <code>acf()</code> function to compute autocorrelation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>acf_results <span class="ot">&lt;-</span> <span class="fu">acf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">type =</span> <span class="st">"correlation"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> <span class="dv">10</span>)</span>
@@ -323,8 +321,8 @@ Autocorrelations of series 'earthquake$numbers', by lag
 </div>
 </div>
 </section>
-<section id="use-feastsacf" class="level3" data-number="2.1.5">
-<h3 data-number="2.1.5" class="anchored" data-anchor-id="use-feastsacf"><span class="header-section-number">2.1.5</span> Use <code>feasts::ACF()</code></h3>
+<section id="use-feastsacf" class="level4" data-number="2.1.3.2">
+<h4 data-number="2.1.3.2" class="anchored" data-anchor-id="use-feastsacf"><span class="header-section-number">2.1.3.2</span> Use <code>feasts::ACF()</code></h4>
 <p><code>{feasts}</code>, a part of tidyverts framework, provide <code>ACF()</code> function to compute autocorrelation on <code>tsibble</code> object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
@@ -345,8 +343,66 @@ Autocorrelations of series 'earthquake$numbers', by lag
 10      10Y -0.0925</code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="ex-2.4-partial-autocorrelation-function" class="level3" data-number="2.1.4">
+<h3 data-number="2.1.4" class="anchored" data-anchor-id="ex-2.4-partial-autocorrelation-function"><span class="header-section-number">2.1.4</span> Ex 2.4: Partial autocorrelation function</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(acf_results<span class="sc">$</span>acf[<span class="dv">10</span><span class="sc">:</span><span class="dv">2</span>], acf_results<span class="sc">$</span>acf[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> acf_results<span class="sc">$</span>acf[<span class="dv">2</span><span class="sc">:</span><span class="dv">11</span>]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reduce</span>(</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  \(m, i) <span class="fu">rbind</span>(m, x[(<span class="dv">10</span> <span class="sc">-</span> i) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)]),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">.init =</span> x[<span class="dv">10</span><span class="sc">:</span><span class="dv">19</span>]</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">solve</span>(mat[<span class="dv">1</span><span class="sc">:</span>k, <span class="dv">1</span><span class="sc">:</span>k], y[<span class="dv">1</span><span class="sc">:</span>k])[k]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  0.395037778  0.184088155  0.113167641  0.060683539 -0.004447767
+ [6] -0.046903292  0.109748706 -0.035820889 -0.209890421 -0.061031590</code></pre>
+</div>
+</div>
+<section id="use-statspacf" class="level4" data-number="2.1.4.1">
+<h4 data-number="2.1.4.1" class="anchored" data-anchor-id="use-statspacf"><span class="header-section-number">2.1.4.1</span> Use <code>stats::pacf()</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pacf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">lag.max =</span> <span class="dv">10</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Partial autocorrelations of series 'earthquake$numbers', by lag
+
+     1      2      3      4      5      6      7      8      9     10 
+ 0.395  0.184  0.113  0.061 -0.004 -0.047  0.110 -0.036 -0.210 -0.061 </code></pre>
+</div>
+</div>
+</section>
+<section id="use-feastspacf" class="level4" data-number="2.1.4.2">
+<h4 data-number="2.1.4.2" class="anchored" data-anchor-id="use-feastspacf"><span class="header-section-number">2.1.4.2</span> Use <code>feasts::PACF()</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 10 x 2 [1Y]
+        lag     pacf
+   &lt;cf_lag&gt;    &lt;dbl&gt;
+ 1       1Y  0.395  
+ 2       2Y  0.184  
+ 3       3Y  0.113  
+ 4       4Y  0.0607 
+ 5       5Y -0.00445
+ 6       6Y -0.0469 
+ 7       7Y  0.110  
+ 8       8Y -0.0358 
+ 9       9Y -0.210  
+10      10Y -0.0610 </code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 </section>
 
