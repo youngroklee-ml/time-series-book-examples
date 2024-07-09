@@ -76,6 +76,15 @@ earthquake |>
   ACF(numbers, lag_max = 10)
 ```
 
+Visualize autocorrelation function.
+
+```{r}
+earthquake |> 
+  ACF(numbers, lag_max = 10) |> 
+  autoplot()
+```
+
+
 
 ### Ex 2.4: Partial autocorrelation function
 
@@ -108,3 +117,9 @@ earthquake |>
   PACF(numbers, lag_max = 10)
 ```
 
+Visualize partial autocorrelation function.
+
+```{r}
+earthquake |> 
+  PACF(numbers, lag_max = 10)
+```
