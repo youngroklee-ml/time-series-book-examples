@@ -1,0 +1,250 @@
+# ARMA forecast
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+```
+
+## Example 5.2
+
+### Data
+
+```{r}
+ts <-
+  tsibble(
+    t = 1:20,
+    value = c(-1.356, -1.567, -0.994, -0.417, 0.840, -0.991, 0.166, 0.889, 0.514, -0.491,
+              -0.766, -1.936, -2.223, -1.395, -1.512, -0.582, 1.204, 1.706, -0.768, -0.313),
+    index = t
+  )
+```
+
+### Time series cross-validation
+
+```{r}
+ts_cv <- 
+  ts |> 
+  stretch_tsibble(.step = 1, .init = 10) |> 
+  filter(.id != max(.id))
+
+ts_cv
+```
+
+#### AR with known parameter values
+
+Pass `fixed` argument inside `order()` as a list of known parameter values.
+
+```{r}
+fit <- 
+  ts_cv |> 
+  model(AR = AR(value ~ order(2, fixed = list(ar1 = 0.7, ar2 = -0.2))))
+
+fit
+```
+
+Check whether AR(2) in each cross-validation set is set with the known parameter values.
+
+```{r}
+tidy(fit)
+```
+
+Forecast one-step in each cross-validation set.
+
+```{r}
+fc <- 
+  fit |> 
+  forecast(h = 1)
+
+fc
+```
+
+Compare one-step forecast `.mean` with observed value `value`.
+
+```{r}
+fc |> 
+  as_tibble() |> 
+  select(t, .mean) |> 
+  inner_join(ts) |> 
+  mutate(resid = value - .mean)
+```
+
+Evaluate forecast error.
+
+```{r}
+fc |> 
+  accuracy(ts)
+```
+
+
+#### AR with unknown parameter values
+
+Now, repeat the process, but let AR(2) model coefficients are unknown and estimated in each cross-validation set.
+
+```{r}
+fit <- 
+  ts_cv |> 
+  model(AR = AR(value ~ order(2)))
+
+fit
+```
+
+Check model coefficients:
+
+```{r}
+tidy(fit)
+```
+
+Forecast:
+
+```{r}
+fc <- 
+  fit |> 
+  forecast(h = 1)
+
+fc
+```
+
+Forecast accuracy:
+
+```{r}
+fc |> 
+  accuracy(ts)
+```
+
+
+## Example 5.3
+
+### Data
+
+```{r}
+ts <-
+  tsibble(
+    t = 1:20,
+    value = c(-1.377, 1.856, -0.655, -0.587, -0.188, 1.414, 0.731, -1.628, -0.511, -0.294,
+              0.499, -0.442, 1.019, -1.705, -0.139, 0.219, 1.131, -0.508, 0.541, -0.809),
+    index = t
+  )
+```
+
+### Time series cross-validation
+
+```{r}
+ts_cv <- 
+  ts |> 
+  stretch_tsibble(.step = 1, .init = 10) |> 
+  filter(.id != max(.id))
+```
+
+#### MA with known parameter values
+
+Call `ARIMA()` with `pdq(0, 0, 2)` to estimate the MA(2) model. In `pdq()`, set `fixed` argument to force a specific coefficient value is used.
+
+```{r}
+fit <- 
+  ts_cv |> 
+  model(MA = ARIMA(value ~ 0 + pdq(0, 0, 2, fixed = list(ma1 = -0.6, ma2 = -0.2))))
+
+fit
+```
+
+Confirm known coefficients:
+
+```{r}
+tidy(fit)
+```
+
+Forecast:
+
+```{r}
+fc <- 
+  fit |> 
+  forecast(h = 1)
+
+fc
+```
+
+Accuracy:
+
+```{r}
+fc |> 
+  accuracy(ts)
+```
+
+#### MA with unknown parameter values
+
+```{r}
+fit <- 
+  ts_cv |> 
+  model(MA = ARIMA(value ~ 0 + pdq(0, 0, 2)))
+
+fit
+```
+
+```{r}
+tidy(fit)
+```
+
+```{r}
+fc <- 
+  fit |> 
+  forecast(h = 1)
+
+fc
+```
+
+```{r}
+fc |> 
+  accuracy(ts)
+```
+
+
+## Example 5.7
+
+### Load data
+
+```{r}
+ts <- 
+  read_excel("data/J13.xlsx", skip = 1) |> 
+  mutate(t = row_number()) |> 
+  tsibble(index = t)
+```
+
+### Estimate AR(2) with first 200 observations
+
+```{r}
+fit <- 
+  ts |> 
+  filter(t <= 200) |> 
+  model(AR = AR(Z ~ order(2)))
+```
+
+Coefficients:
+
+```{r}
+tidy(fit)
+```
+
+Model statistics:
+
+```{r}
+glance(fit)
+```
+
+
+### Time series cross-validation
+
+```{r}
+ts_cv <- 
+  ts |> 
+  stretch_tsibble(.step = 1, .init = 200) |> 
+  filter(.id != max(.id))
+
+ts_cv |> 
+  model(AR = AR(Z ~ order(2))) |> 
+  forecast(h = 1) |> 
+  accuracy(ts)
+```
+
