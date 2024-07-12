@@ -60,20 +60,13 @@ nile_flow |>
 
 ### Ex 4.2: Model identification
 
-#### ACF
+#### ACF and PACF
+
+Use `gg_tsdisplay()` from `{feasts}` package, with `plot_type = "partial"` argument to plot both ACF and PACF along with the time series plot.
 
 ```{r}
 nile_flow |> 
-  ACF(mean_flow) |> 
-  autoplot()
-```
-
-#### PACF
-
-```{r}
-nile_flow |> 
-  PACF(mean_flow) |> 
-  autoplot()
+  gg_tsdisplay(mean_flow, plot_type = "partial")
 ```
 
 
@@ -115,9 +108,18 @@ glance(ar_fit)
 
 ### Ex 4.8: Residual diagnostics
 
+Visualize in-sample residuals. Use `gg_tsresiduals()` from `{feasts}` package.
+
+```{r}
+ar_fit |> 
+  gg_tsresiduals()
+```
+
+Ljung-Box test with 3 degrees of freedom: 1 for constant term and 2 for auto-regressive coefficients.
+
 ```{r}
 ar_fit |> 
   augment() |> 
-  features(.innov, ljung_box, lag = 12)
+  features(.innov, ljung_box, lag = 12, dof = 3)
 ```
 
