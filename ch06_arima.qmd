@@ -85,6 +85,7 @@ report(auto_arima_fit)
 While it still suggests a seasonal MA(1) on seasonally differenced time series, it now suggests a more complex non-seasonal model: ARIMA(2, 0, 2). Let us visualize residuals from this model.
 
 ```{r}
+#| eval: false
 auto_arima_fit |> 
   gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
