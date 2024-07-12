@@ -446,7 +446,7 @@ AIC=8919   AICc=8919.32   BIC=8946.18</code></pre>
 </div>
 </div>
 </div>
-<p>And conduct Ljung-Box test. Set <code>dof=6</code>, five from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).</p>
+<p>And conduct Ljung-Box test. Set <code>dof=6</code>, five from a non-seasonal ARIMA(1, 0, 4) and another from a seasonal MA(1).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>best_arima_fit <span class="sc">|&gt;</span> </span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>() <span class="sc">|&gt;</span> </span>
