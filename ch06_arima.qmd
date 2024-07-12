@@ -1,0 +1,132 @@
+# ARIMA
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+```
+
+
+## Example 6.6
+
+### Load data
+
+```{r}
+traffic_ts <- 
+  read_excel("data/J17.xlsx") |> 
+  set_names(c("date", "traffic")) |> 
+  mutate(date = ymd(date)) |> 
+  as_tsibble(index = date)
+```
+
+### ACF and PACF
+
+Visualize original time series with its ACF and PACF.
+
+```{r}
+traffic_ts |> 
+  gg_tsdisplay(traffic, plot_type = 'partial')
+```
+
+
+Visualize seasonally differenced time series with it ACF and PACF. Use `difference()` with `lag = 7` to compute week-to-week differences.
+
+```{r}
+traffic_ts |> 
+  gg_tsdisplay(difference(traffic, lag = 7), plot_type = 'partial')
+```
+
+### ARIMA
+
+#### Determine a model from plots
+
+Exponentially decreasing ACF suggests a non-seasonal AR(1), while the significant spike at lag 7 suggests a seasonal MA(1). Use `pdq()` to specify a non-seasonal model and `PDQ()` to specify a seasonal model.
+
+```{r}
+arima_fit <- 
+  traffic_ts |> 
+  model(arima100011 = ARIMA(traffic ~ pdq(1, 0, 0) + PDQ(0, 1, 1)))
+
+report(arima_fit)
+```
+
+Visualize residuals.
+
+```{r}
+arima_fit |> 
+  gg_tsresiduals()
+```
+
+Residuals looks distributed around zeros with no trends. Let us conduct Ljung-Box test. Set `dof=2` for two parameters, one from a non-seasonal AR(1) and another from a seasonal MA(1).
+
+```{r}
+arima_fit |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 24, dof = 2)
+```
+
+The p-value is less than 0.05. There may be some opportunities to improve.
+
+
+#### Auto ARIMA with stepwise search
+
+Let us determine ARIMA model specification based on information criteria.
+
+```{r}
+auto_arima_fit <- 
+  traffic_ts |> 
+  model(auto = ARIMA(traffic))
+
+report(auto_arima_fit)
+```
+
+While it still suggests a seasonal MA(1) on seasonally differenced time series, it now suggests a more complex non-seasonal model: ARIMA(2, 0, 2). Let us visualize residuals from this model.
+
+```{r}
+auto_arima_fit |> 
+  gg_tsresiduals()
+```
+
+And conduct Ljung-Box test. Set `dof=5`, four from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).
+
+```{r}
+auto_arima_fit |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 24, dof = 5)
+```
+
+The p-value is still less than 0.05.
+
+
+#### Auto ARIMA with larger parameterization space
+
+Let us determine ARIMA model specification based on information criteria. This process will take a minute.
+
+```{r}
+best_arima_fit <- 
+  traffic_ts |> 
+  model(best = ARIMA(traffic, stepwise = FALSE, approximation = FALSE))
+
+report(best_arima_fit)
+```
+
+It now suggests even more complex non-seasonal model: ARIMA(1, 0, 4). Let us visualize residuals from this model.
+
+```{r}
+best_arima_fit |> 
+  gg_tsresiduals()
+```
+
+And conduct Ljung-Box test. Set `dof=6`, five from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).
+
+```{r}
+best_arima_fit |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 24, dof = 6)
+```
+
+Now the p-value is greater than 0.05.
+
+
