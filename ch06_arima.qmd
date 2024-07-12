@@ -116,6 +116,7 @@ report(best_arima_fit)
 It now suggests even more complex non-seasonal model: ARIMA(1, 0, 4). Let us visualize residuals from this model.
 
 ```{r}
+#| eval: false
 best_arima_fit |> 
   gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
