@@ -120,7 +120,7 @@ best_arima_fit |>
   gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
 
-And conduct Ljung-Box test. Set `dof=6`, five from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).
+And conduct Ljung-Box test. Set `dof=6`, five from a non-seasonal ARIMA(1, 0, 4) and another from a seasonal MA(1).
 
 ```{r}
 best_arima_fit |> 
