@@ -56,7 +56,7 @@ Visualize residuals.
 
 ```{r}
 arima_fit |> 
-  gg_tsresiduals(lag_max = 24)
+  gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
 
 Residuals looks distributed around zeros with no trends. Let us conduct Ljung-Box test. Set `dof=2` for two parameters, one from a non-seasonal AR(1) and another from a seasonal MA(1).
@@ -86,7 +86,7 @@ While it still suggests a seasonal MA(1) on seasonally differenced time series, 
 
 ```{r}
 auto_arima_fit |> 
-  gg_tsresiduals(lag_max = 24)
+  gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
 
 And conduct Ljung-Box test. Set `dof=5`, four from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).
@@ -116,7 +116,7 @@ It now suggests even more complex non-seasonal model: ARIMA(1, 0, 4). Let us vis
 
 ```{r}
 best_arima_fit |> 
-  gg_tsresiduals(lag_max = 24)
+  gg_tsresiduals(type = "innovation", lag_max = 24)
 ```
 
 And conduct Ljung-Box test. Set `dof=6`, five from a non-seasonal ARIMA(2, 0, 2) and another from a seasonal MA(1).
