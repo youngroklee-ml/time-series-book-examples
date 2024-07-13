@@ -102,6 +102,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -199,6 +228,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data"><span class="header-section-number">6.1.1</span> Load data</a></li>
   <li><a href="#acf-and-pacf" id="toc-acf-and-pacf" class="nav-link" data-scroll-target="#acf-and-pacf"><span class="header-section-number">6.1.2</span> ACF and PACF</a></li>
   <li><a href="#arima" id="toc-arima" class="nav-link" data-scroll-target="#arima"><span class="header-section-number">6.1.3</span> ARIMA</a></li>
+  </ul></li>
+  <li><a href="#example-6.11" id="toc-example-6.11" class="nav-link" data-scroll-target="#example-6.11"><span class="header-section-number">6.2</span> Example 6.11</a>
+  <ul class="collapse">
+  <li><a href="#load-data-1" id="toc-load-data-1" class="nav-link" data-scroll-target="#load-data-1"><span class="header-section-number">6.2.1</span> Load data</a></li>
+  <li><a href="#visualize" id="toc-visualize" class="nav-link" data-scroll-target="#visualize"><span class="header-section-number">6.2.2</span> Visualize</a></li>
+  </ul></li>
+  <li><a href="#example-6.12---6.13" id="toc-example-6.12---6.13" class="nav-link" data-scroll-target="#example-6.12---6.13"><span class="header-section-number">6.3</span> Example 6.12 - 6.13</a>
+  <ul class="collapse">
+  <li><a href="#load-data-2" id="toc-load-data-2" class="nav-link" data-scroll-target="#load-data-2"><span class="header-section-number">6.3.1</span> Load data</a></li>
+  <li><a href="#ex-6.12-classical-decomposition---additive" id="toc-ex-6.12-classical-decomposition---additive" class="nav-link" data-scroll-target="#ex-6.12-classical-decomposition---additive"><span class="header-section-number">6.3.2</span> Ex 6.12: Classical decomposition - additive</a></li>
+  <li><a href="#ex-6.13-classical-decomposition---multiplicative" id="toc-ex-6.13-classical-decomposition---multiplicative" class="nav-link" data-scroll-target="#ex-6.13-classical-decomposition---multiplicative"><span class="header-section-number">6.3.3</span> Ex 6.13: Classical decomposition - multiplicative</a></li>
+  <li><a href="#stl" id="toc-stl" class="nav-link" data-scroll-target="#stl"><span class="header-section-number">6.3.4</span> STL</a></li>
+  </ul></li>
+  <li><a href="#example-6.14" id="toc-example-6.14" class="nav-link" data-scroll-target="#example-6.14"><span class="header-section-number">6.4</span> Example 6.14</a>
+  <ul class="collapse">
+  <li><a href="#load-data-3" id="toc-load-data-3" class="nav-link" data-scroll-target="#load-data-3"><span class="header-section-number">6.4.1</span> Load data</a></li>
+  <li><a href="#unit-root-test" id="toc-unit-root-test" class="nav-link" data-scroll-target="#unit-root-test"><span class="header-section-number">6.4.2</span> Unit root test</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -459,6 +505,553 @@ AIC=8919   AICc=8919.32   BIC=8946.18</code></pre>
 </div>
 </div>
 <p>Now the p-value is greater than 0.05.</p>
+</section>
+</section>
+</section>
+<section id="example-6.11" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="example-6.11"><span class="header-section-number">6.2</span> Example 6.11</h2>
+<section id="load-data-1" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="load-data-1"><span class="header-section-number">6.2.1</span> Load data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="ot">&lt;-</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data/J09.xlsx"</span>, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_max =</span> <span class="dv">99</span>, </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.name_repair =</span> janitor<span class="sc">::</span>make_clean_names</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">1872</span><span class="sc">:</span><span class="dv">1970</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A30 / R30C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A31 / R31C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A32 / R32C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A33 / R33C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A34 / R34C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A35 / R35C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A36 / R36C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A37 / R37C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A38 / R38C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A39 / R39C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A40 / R40C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A41 / R41C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A42 / R42C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A43 / R43C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A44 / R44C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A45 / R45C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A46 / R46C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A47 / R47C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A48 / R48C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A49 / R49C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A50 / R50C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A51 / R51C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A52 / R52C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A53 / R53C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A54 / R54C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A55 / R55C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A56 / R56C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A57 / R57C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A58 / R58C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A59 / R59C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A60 / R60C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A61 / R61C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A62 / R62C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A63 / R63C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A64 / R64C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A65 / R65C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A66 / R66C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A67 / R67C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A68 / R68C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A69 / R69C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A70 / R70C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A71 / R71C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A72 / R72C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A73 / R73C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A74 / R74C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A75 / R75C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A76 / R76C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A77 / R77C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A78 / R78C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A79 / R79C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A80 / R80C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A81 / R81C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A82 / R82C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A83 / R83C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A84 / R84C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A85 / R85C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A86 / R86C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A87 / R87C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A88 / R88C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A89 / R89C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A90 / R90C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A91 / R91C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A92 / R92C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A93 / R93C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A94 / R94C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A95 / R95C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A96 / R96C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A97 / R97C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A98 / R98C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A99 / R99C1: got a date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in A100 / R100C1: got a date</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="visualize"><span class="header-section-number">6.2.2</span> Visualize</h3>
+<section id="original-series" class="level4" data-number="6.2.2.1">
+<h4 data-number="6.2.2.1" class="anchored" data-anchor-id="original-series"><span class="header-section-number">6.2.2.1</span> Original series</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(mean_flow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="log-transformed-series" class="level4" data-number="6.2.2.2">
+<h4 data-number="6.2.2.2" class="anchored" data-anchor-id="log-transformed-series"><span class="header-section-number">6.2.2.2</span> Log-transformed series</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="fu">log</span>(mean_flow))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="box-cox-transformation" class="level4" data-number="6.2.2.3">
+<h4 data-number="6.2.2.3" class="anchored" data-anchor-id="box-cox-transformation"><span class="header-section-number">6.2.2.3</span> Box-Cox transformation</h4>
+<p><span class="math display">\[
+w_t = \begin{cases}
+\log(y_t) &amp; \text{if } \lambda = 0\\
+\left(sign(y_t)\left|y_t\right|^\lambda - 1\right) / \lambda &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<p>Choose <span class="math inline">\(\lambda\)</span> by using <code>guerreo()</code> from <code>{feasts}</code> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> </span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  nile_flow <span class="sc">|&gt;</span></span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(mean_flow, <span class="at">features =</span> guerrero) <span class="sc">|&gt;</span></span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(lambda_guerrero)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>nile_flow <span class="sc">|&gt;</span> </span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="fu">box_cox</span>(mean_flow, lambda))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="example-6.12---6.13" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="example-6.12---6.13"><span class="header-section-number">6.3</span> Example 6.12 - 6.13</h2>
+<section id="load-data-2" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="load-data-2"><span class="header-section-number">6.3.1</span> Load data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>gas_consumption <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/J03.xlsx"</span>, <span class="at">skip =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(year, <span class="at">.direction =</span> <span class="st">"down"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">consumption =</span> comsumption) <span class="sc">|&gt;</span>  <span class="co"># fix typo in column name</span></span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_month =</span> <span class="fu">make_yearmonth</span>(year, month), <span class="at">.before =</span> <span class="dv">1</span>L) <span class="sc">|&gt;</span> </span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(year, month)) <span class="sc">|&gt;</span> </span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> year_month)</span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>gas_consumption</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 84 x 2 [1M]
+   year_month consumption
+        &lt;mth&gt;       &lt;dbl&gt;
+ 1   2011 Jan        2006
+ 2   2011 Feb        1620
+ 3   2011 Mar        1354
+ 4   2011 Apr         956
+ 5   2011 May         560
+ 6   2011 Jun         317
+ 7   2011 Jul         254
+ 8   2011 Aug         214
+ 9   2011 Sep         231
+10   2011 Oct         482
+# ℹ 74 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="ex-6.12-classical-decomposition---additive" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="ex-6.12-classical-decomposition---additive"><span class="header-section-number">6.3.2</span> Ex 6.12: Classical decomposition - additive</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_additive <span class="ot">&lt;-</span> </span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  gas_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="fu">classical_decomposition</span>(consumption, <span class="at">type =</span> <span class="st">"additive"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Extract components by calling <code>components()</code> function. It returns <code>dable</code> object, which stands for decomposition table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_additive <span class="sc">|&gt;</span> </span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A dable: 84 x 7 [1M]
+# Key:     .model [1]
+# :        consumption = trend + seasonal + random
+   .model             year_month consumption trend seasonal random season_adjust
+   &lt;chr&gt;                   &lt;mth&gt;       &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;
+ 1 "classical_decomp…   2011 Jan        2006   NA     972.   NA            1034.
+ 2 "classical_decomp…   2011 Feb        1620   NA     807.   NA             813.
+ 3 "classical_decomp…   2011 Mar        1354   NA     487.   NA             867.
+ 4 "classical_decomp…   2011 Apr         956   NA      41.0  NA             915.
+ 5 "classical_decomp…   2011 May         560   NA    -327.   NA             887.
+ 6 "classical_decomp…   2011 Jun         317   NA    -524.   NA             841.
+ 7 "classical_decomp…   2011 Jul         254  834.   -574.   -6.33          828.
+ 8 "classical_decomp…   2011 Aug         214  828.   -606.   -7.51          820.
+ 9 "classical_decomp…   2011 Sep         231  831.   -585.  -15.4           816.
+10 "classical_decomp…   2011 Oct         482  829.   -396.   48.9           878.
+# ℹ 74 more rows</code></pre>
+</div>
+</div>
+<p>Plot each components.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_additive <span class="sc">|&gt;</span> </span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 6 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="ex-6.13-classical-decomposition---multiplicative" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="ex-6.13-classical-decomposition---multiplicative"><span class="header-section-number">6.3.3</span> Ex 6.13: Classical decomposition - multiplicative</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_multiplicative <span class="ot">&lt;-</span> </span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>  gas_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="fu">classical_decomposition</span>(consumption, <span class="at">type =</span> <span class="st">"multiplicative"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_multiplicative <span class="sc">|&gt;</span> </span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A dable: 84 x 7 [1M]
+# Key:     .model [1]
+# :        consumption = trend * seasonal * random
+   .model             year_month consumption trend seasonal random season_adjust
+   &lt;chr&gt;                   &lt;mth&gt;       &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;
+ 1 "classical_decomp…   2011 Jan        2006   NA     2.21   NA             906.
+ 2 "classical_decomp…   2011 Feb        1620   NA     2.01   NA             807.
+ 3 "classical_decomp…   2011 Mar        1354   NA     1.61   NA             842.
+ 4 "classical_decomp…   2011 Apr         956   NA     1.05   NA             912.
+ 5 "classical_decomp…   2011 May         560   NA     0.589  NA             950.
+ 6 "classical_decomp…   2011 Jun         317   NA     0.348  NA             912.
+ 7 "classical_decomp…   2011 Jul         254  834.    0.285   1.07          891.
+ 8 "classical_decomp…   2011 Aug         214  828.    0.244   1.06          876.
+ 9 "classical_decomp…   2011 Sep         231  831.    0.272   1.02          851.
+10 "classical_decomp…   2011 Oct         482  829.    0.504   1.15          955.
+# ℹ 74 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_multiplicative <span class="sc">|&gt;</span> </span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 6 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="stl" class="level3" data-number="6.3.4">
+<h3 data-number="6.3.4" class="anchored" data-anchor-id="stl"><span class="header-section-number">6.3.4</span> STL</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_stl <span class="ot">&lt;-</span> </span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>  gas_consumption <span class="sc">|&gt;</span> </span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="fu">STL</span>(consumption))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_stl <span class="sc">|&gt;</span> </span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">components</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_stl <span class="sc">|&gt;</span> </span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gg_tsresiduals</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>gas_consumption_stl <span class="sc">|&gt;</span> </span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(.innov, ljung_box, <span class="at">lag =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .model           lb_stat lb_pvalue
+  &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;
+1 STL(consumption)    28.9   0.00129</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="example-6.14" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="example-6.14"><span class="header-section-number">6.4</span> Example 6.14</h2>
+<section id="load-data-3" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="load-data-3"><span class="header-section-number">6.4.1</span> Load data</h3>
+<p>Because data is not observed on dates that stock market is closed (e.g.&nbsp;weekends, holidays), data is not regular daily time series. Let us create new index column <code>t</code> to denote number of business days.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>kospi <span class="ot">&lt;-</span> </span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"data/J10.xlsx"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as_date</span>(Date)) <span class="sc">|&gt;</span> </span>
+<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">t =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tsibble</span>(<span class="at">index =</span> t)</span>
+<span id="cb122-6"><a href="#cb122-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-7"><a href="#cb122-7" aria-hidden="true" tabindex="-1"></a>kospi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 239 x 6 [1]
+   Date        Open  High   Low Close     t
+   &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1 2017-07-03 2398. 2400. 2385. 2394.     1
+ 2 2017-07-04 2395. 2398. 2376. 2381.     2
+ 3 2017-07-05 2377. 2390. 2376. 2388.     3
+ 4 2017-07-06 2390. 2392. 2381. 2388.     4
+ 5 2017-07-07 2376. 2385. 2373. 2380.     5
+ 6 2017-07-10 2386. 2390. 2378. 2382.     6
+ 7 2017-07-11 2386. 2396. 2383. 2396      7
+ 8 2017-07-12 2395. 2399. 2390. 2392.     8
+ 9 2017-07-13 2406. 2422. 2403. 2409.     9
+10 2017-07-14 2418. 2421. 2411. 2415.    10
+# ℹ 229 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>kospi <span class="sc">|&gt;</span> </span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gg_tsdisplay</span>(Close, <span class="at">plot_type =</span> <span class="st">"partial"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="unit-root-test" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="unit-root-test"><span class="header-section-number">6.4.2</span> Unit root test</h3>
+<section id="kpss-test" class="level4" data-number="6.4.2.1">
+<h4 data-number="6.4.2.1" class="anchored" data-anchor-id="kpss-test"><span class="header-section-number">6.4.2.1</span> KPSS test</h4>
+<p>Null hypothesis is that the data are stationary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>kospi <span class="sc">|&gt;</span> </span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(Close, unitroot_kpss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  kpss_stat kpss_pvalue
+      &lt;dbl&gt;       &lt;dbl&gt;
+1     0.716      0.0121</code></pre>
+</div>
+</div>
+<p>It provides p-value less than 0.05, which suggests that the data are not stationary.</p>
+<p>Let us see minimum number of differences to make the data be stationary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>kospi <span class="sc">|&gt;</span> </span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">features</span>(Close, unitroot_ndiffs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  ndiffs
+   &lt;int&gt;
+1      1</code></pre>
+</div>
+</div>
+<p>It suggests one difference to make the data be stationary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a>kospi <span class="sc">|&gt;</span> </span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gg_tsdisplay</span>(<span class="fu">difference</span>(Close), <span class="at">plot_type =</span> <span class="st">"partial"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch06_arima_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>
