@@ -131,3 +131,201 @@ best_arima_fit |>
 Now the p-value is greater than 0.05.
 
 
+## Example 6.11
+
+### Load data
+
+```{r}
+nile_flow <- 
+  read_excel(
+    "data/J09.xlsx", 
+    n_max = 99, 
+    .name_repair = janitor::make_clean_names
+  ) |> 
+  mutate(year = 1872:1970) |> 
+  as_tsibble(index = year)
+```
+
+
+### Visualize
+
+#### Original series
+
+```{r}
+nile_flow |> 
+  autoplot(mean_flow)
+```
+
+#### Log-transformed series
+
+```{r}
+nile_flow |> 
+  autoplot(log(mean_flow))
+```
+
+#### Box-Cox transformation
+
+$$
+w_t = \begin{cases}
+\log(y_t) & \text{if } \lambda = 0\\
+\left(sign(y_t)\left|y_t\right|^\lambda - 1\right) / \lambda & \text{otherwise}
+\end{cases}
+$$
+
+Choose $\lambda$ by using `guerreo()` from `{feasts}` package.
+
+```{r}
+lambda <- 
+  nile_flow |>
+  features(mean_flow, features = guerrero) |>
+  pull(lambda_guerrero)
+```
+
+```{r}
+nile_flow |> 
+  autoplot(box_cox(mean_flow, lambda))
+```
+
+
+## Example 6.12 - 6.13
+
+### Load data
+
+```{r}
+gas_consumption <- read_excel("data/J03.xlsx", skip = 1) |> 
+  fill(year, .direction = "down") |> 
+  rename(consumption = comsumption) |>  # fix typo in column name
+  mutate(year_month = make_yearmonth(year, month), .before = 1L) |> 
+  select(!c(year, month)) |> 
+  as_tsibble(index = year_month)
+
+gas_consumption
+```
+
+
+### Ex 6.12: Classical decomposition - additive
+
+```{r}
+gas_consumption_additive <- 
+  gas_consumption |> 
+  model(classical_decomposition(consumption, type = "additive"))
+```
+
+Extract components by calling `components()` function. It returns `dable` object, which stands for decomposition table.
+
+```{r}
+gas_consumption_additive |> 
+  components()
+```
+
+Plot each components.
+
+```{r}
+gas_consumption_additive |> 
+  components() |> 
+  autoplot()
+```
+
+
+### Ex 6.13: Classical decomposition - multiplicative
+
+```{r}
+gas_consumption_multiplicative <- 
+  gas_consumption |> 
+  model(classical_decomposition(consumption, type = "multiplicative"))
+```
+
+```{r}
+gas_consumption_multiplicative |> 
+  components()
+```
+
+```{r}
+gas_consumption_multiplicative |> 
+  components() |> 
+  autoplot()
+```
+
+```{r}
+gas_consumption_multiplicative |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 10)
+```
+
+
+### STL
+
+```{r}
+gas_consumption_stl <- 
+  gas_consumption |> 
+  model(STL(consumption))
+```
+
+```{r}
+gas_consumption_stl |> 
+  components() |> 
+  autoplot()
+```
+
+
+```{r}
+gas_consumption_stl |> 
+  gg_tsresiduals()
+```
+
+
+```{r}
+gas_consumption_stl |> 
+  augment() |> 
+  features(.innov, ljung_box, lag = 10)
+```
+
+
+## Example 6.14
+
+### Load data
+
+Because data is not observed on dates that stock market is closed (e.g. weekends, holidays), data is not regular daily time series. Let us create new index column `t` to denote number of business days.
+
+```{r}
+kospi <- 
+  read_excel("data/J10.xlsx") |> 
+  mutate(Date = as_date(Date)) |> 
+  mutate(t = row_number()) |> 
+  as_tsibble(index = t)
+
+kospi
+```
+
+```{r}
+kospi |> 
+  gg_tsdisplay(Close, plot_type = "partial")
+```
+
+### Unit root test
+
+#### KPSS test
+
+Null hypothesis is that the data are stationary.
+
+```{r}
+kospi |> 
+  features(Close, unitroot_kpss)
+```
+
+It provides p-value less than 0.05, which suggests that the data are not stationary.
+
+Let us see minimum number of differences to make the data be stationary.
+
+```{r}
+kospi |> 
+  features(Close, unitroot_ndiffs)
+```
+
+It suggests one difference to make the data be stationary.
+
+```{r}
+kospi |> 
+  gg_tsdisplay(difference(Close), plot_type = "partial")
+```
+
