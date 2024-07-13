@@ -246,12 +246,6 @@ gas_consumption_multiplicative |>
   autoplot()
 ```
 
-```{r}
-gas_consumption_multiplicative |> 
-  augment() |> 
-  features(.innov, ljung_box, lag = 10)
-```
-
 
 ### STL
 
