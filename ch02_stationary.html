@@ -103,6 +103,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -318,14 +347,22 @@ The following objects are masked from 'package:base':
 <section id="ex-2.2-autocorrelation-function" class="level3" data-number="2.1.3">
 <h3 data-number="2.1.3" class="anchored" data-anchor-id="ex-2.2-autocorrelation-function"><span class="header-section-number">2.1.3</span> Ex 2.2: Autocorrelation function</h3>
 <p>Use <code>n - 1</code> as denominator for covariance.</p>
+<p><span class="math display">\[
+\hat{\gamma}(k) = \frac{1}{n - 1} \sum_{i=k+1}^{n} (z_i - \bar{z})(z_{i-k} - \bar{z})
+\]</span></p>
+<p><span class="math display">\[
+\hat{\rho}(k) = \hat{\gamma}(k) / \hat{\gamma}(0)
+\]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">sum</span>((earthquake<span class="sc">$</span>numbers[(k<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>n] <span class="sc">-</span> z_bar) <span class="sc">*</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>           (earthquake<span class="sc">$</span>numbers[<span class="dv">1</span><span class="sc">:</span>(n<span class="sc">-</span>k)] <span class="sc">-</span> z_bar)) <span class="sc">/</span> </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>           (n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> gamma_0</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># maximum lag</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">seq_len</span>(K),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">sum</span>((earthquake<span class="sc">$</span>numbers[(k<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>n] <span class="sc">-</span> z_bar) <span class="sc">*</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>           (earthquake<span class="sc">$</span>numbers[<span class="dv">1</span><span class="sc">:</span>(n<span class="sc">-</span>k)] <span class="sc">-</span> z_bar)) <span class="sc">/</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>           (n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> gamma_0</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>rho</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1]  0.39503778  0.31141515  0.26536655  0.21952216  0.15141924  0.08045742
  [7]  0.15754544  0.07392281 -0.10200123 -0.09250562</code></pre>
@@ -335,7 +372,7 @@ The following objects are masked from 'package:base':
 <h4 data-number="2.1.3.1" class="anchored" data-anchor-id="use-statsacf"><span class="header-section-number">2.1.3.1</span> Use <code>stats::acf()</code></h4>
 <p><code>{stats}</code>, one of R’s core package, provides <code>acf()</code> function to compute autocorrelation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>acf_results <span class="ot">&lt;-</span> <span class="fu">acf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">type =</span> <span class="st">"correlation"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> <span class="dv">10</span>)</span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>acf_results <span class="ot">&lt;-</span> <span class="fu">acf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">type =</span> <span class="st">"correlation"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> K)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>acf_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -351,7 +388,7 @@ Autocorrelations of series 'earthquake$numbers', by lag
 <p><code>{feasts}</code>, a part of tidyverts framework, provide <code>ACF()</code> function to compute autocorrelation on <code>tsibble</code> object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tsibble: 10 x 2 [1Y]
         lag     acf
@@ -371,7 +408,7 @@ Autocorrelations of series 'earthquake$numbers', by lag
 <p>Visualize autocorrelation function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ACF</span>(numbers, <span class="at">lag_max =</span> K) <span class="sc">|&gt;</span> </span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -386,19 +423,20 @@ Autocorrelations of series 'earthquake$numbers', by lag
 <section id="ex-2.4-partial-autocorrelation-function" class="level3" data-number="2.1.4">
 <h3 data-number="2.1.4" class="anchored" data-anchor-id="ex-2.4-partial-autocorrelation-function"><span class="header-section-number">2.1.4</span> Ex 2.4: Partial autocorrelation function</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(acf_results<span class="sc">$</span>acf[<span class="dv">10</span><span class="sc">:</span><span class="dv">2</span>], acf_results<span class="sc">$</span>acf[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> acf_results<span class="sc">$</span>acf[<span class="dv">2</span><span class="sc">:</span><span class="dv">11</span>]</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reduce</span>(</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  \(m, i) <span class="fu">rbind</span>(m, x[(<span class="dv">10</span> <span class="sc">-</span> i) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)]),</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">.init =</span> x[<span class="dv">10</span><span class="sc">:</span><span class="dv">19</span>]</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">solve</span>(mat[<span class="dv">1</span><span class="sc">:</span>k, <span class="dv">1</span><span class="sc">:</span>k], y[<span class="dv">1</span><span class="sc">:</span>k])[k]</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> acf_results<span class="sc">$</span>acf[<span class="fu">c</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rev</span>(<span class="fu">seq_len</span>(K <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>), <span class="dv">1</span>, <span class="fu">seq_len</span>(K <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>)]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> acf_results<span class="sc">$</span>acf[<span class="fu">seq_len</span>(K) <span class="sc">+</span> <span class="dv">1</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">reduce</span>(</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setdiff</span>(<span class="fu">seq_len</span>(K), <span class="dv">1</span>),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  \(m, i) <span class="fu">rbind</span>(m, x[(K <span class="sc">-</span> i) <span class="sc">+</span> <span class="fu">seq_len</span>(K)]),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">.init =</span> x[(K <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="fu">seq_len</span>(K)]</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">seq_len</span>(K),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  \(k) <span class="fu">solve</span>(mat[<span class="dv">1</span><span class="sc">:</span>k, <span class="dv">1</span><span class="sc">:</span>k], y[<span class="dv">1</span><span class="sc">:</span>k])[k]</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1]  0.395037778  0.184088155  0.113167641  0.060683539 -0.004447767
  [6] -0.046903292  0.109748706 -0.035820889 -0.209890421 -0.061031590</code></pre>
@@ -407,7 +445,7 @@ Autocorrelations of series 'earthquake$numbers', by lag
 <section id="use-statspacf" class="level4" data-number="2.1.4.1">
 <h4 data-number="2.1.4.1" class="anchored" data-anchor-id="use-statspacf"><span class="header-section-number">2.1.4.1</span> Use <code>stats::pacf()</code></h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pacf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">lag.max =</span> <span class="dv">10</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pacf</span>(earthquake<span class="sc">$</span>numbers, <span class="at">lag.max =</span> K, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Partial autocorrelations of series 'earthquake$numbers', by lag
@@ -421,7 +459,7 @@ Partial autocorrelations of series 'earthquake$numbers', by lag
 <h4 data-number="2.1.4.2" class="anchored" data-anchor-id="use-feastspacf"><span class="header-section-number">2.1.4.2</span> Use <code>feasts::PACF()</code></h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tsibble: 10 x 2 [1Y]
         lag     pacf
@@ -441,7 +479,7 @@ Partial autocorrelations of series 'earthquake$numbers', by lag
 <p>Visualize partial autocorrelation function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tsibble: 10 x 2 [1Y]
         lag     pacf
