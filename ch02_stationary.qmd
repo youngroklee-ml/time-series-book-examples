@@ -47,9 +47,19 @@ gamma_0
 
 Use `n - 1` as denominator for covariance.
 
+$$
+\hat{\gamma}(k) = \frac{1}{n - 1} \sum_{i=k+1}^{n} (z_i - \bar{z})(z_{i-k} - \bar{z})
+$$
+
+$$
+\hat{\rho}(k) = \hat{\gamma}(k) / \hat{\gamma}(0)
+$$
+
 ```{r}
+K <- 10 # maximum lag
+
 rho <- map_dbl(
-  1:10,
+  seq_len(K),
   \(k) sum((earthquake$numbers[(k+1):n] - z_bar) * 
            (earthquake$numbers[1:(n-k)] - z_bar)) / 
            (n - 1) / gamma_0
@@ -62,7 +72,7 @@ rho
 `{stats}`, one of R's core package, provides `acf()` function to compute autocorrelation.
 
 ```{r}
-acf_results <- acf(earthquake$numbers, type = "correlation", plot = FALSE, lag.max = 10)
+acf_results <- acf(earthquake$numbers, type = "correlation", plot = FALSE, lag.max = K)
 acf_results
 ```
 
@@ -73,14 +83,14 @@ acf_results
 
 ```{r}
 earthquake |> 
-  ACF(numbers, lag_max = 10)
+  ACF(numbers, lag_max = K)
 ```
 
 Visualize autocorrelation function.
 
 ```{r}
 earthquake |> 
-  ACF(numbers, lag_max = 10) |> 
+  ACF(numbers, lag_max = K) |> 
   autoplot()
 ```
 
@@ -89,37 +99,39 @@ earthquake |>
 ### Ex 2.4: Partial autocorrelation function
 
 ```{r}
-x <- c(acf_results$acf[10:2], acf_results$acf[1:10])
-y <- acf_results$acf[2:11]
+x <- acf_results$acf[c(
+  rev(seq_len(K - 1) + 1), 1, seq_len(K - 1) + 1)]
+y <- acf_results$acf[seq_len(K) + 1]
 
 mat <- reduce(
-  2:10,
-  \(m, i) rbind(m, x[(10 - i) + (1:10)]),
-  .init = x[10:19]
+  setdiff(seq_len(K), 1),
+  \(m, i) rbind(m, x[(K - i) + seq_len(K)]),
+  .init = x[(K - 1) + seq_len(K)]
 )
 
 map_dbl(
-  1:10,
+  seq_len(K),
   \(k) solve(mat[1:k, 1:k], y[1:k])[k]
 )
 ```
 
+
 #### Use `stats::pacf()`
 
 ```{r}
-pacf(earthquake$numbers, lag.max = 10, plot = FALSE)
+pacf(earthquake$numbers, lag.max = K, plot = FALSE)
 ```
 
 #### Use `feasts::PACF()`
 
 ```{r}
 earthquake |> 
-  PACF(numbers, lag_max = 10)
+  PACF(numbers, lag_max = K)
 ```
 
 Visualize partial autocorrelation function.
 
 ```{r}
 earthquake |> 
-  PACF(numbers, lag_max = 10)
+  PACF(numbers, lag_max = K)
 ```
