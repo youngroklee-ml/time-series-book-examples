@@ -1,0 +1,214 @@
+# Spectral analysis
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+library(urca)    # for auto arima on linux machine (github action)
+```
+
+
+## Examples 7.7, 7.9
+
+### Data
+
+```{r}
+ts <- tsibble(t = 1:7, y = c(1, 2, 3, 4, 3, 2, 1), index = t)
+ts |> 
+  autoplot(y)
+```
+
+### Ex 7.7: Peroidogram
+
+```{r}
+n <- nrow(ts)
+
+periodogram <- 
+  ts |> 
+  mutate(
+    k = row_number() - 1,
+    w = 2 * pi * k / n
+  ) |> 
+  rowwise() |> 
+  mutate(
+    a = 1 / sqrt(n) * sum(ts$y * cos(ts$t * w)),
+    b = 1 / sqrt(n) * sum(ts$y * sin(ts$t * w)),
+    I = a^2 + b^2
+  ) |> 
+  ungroup()
+
+periodogram
+```
+
+### Ex 7.9: Analysis of Variance
+
+```{r}
+periodogram |> 
+  filter(between(k, 1, n / 2)) |> 
+  transmute(
+    w,
+    df = 2,
+    SSE = 2 * I,
+    MSE = I
+  )
+```
+
+
+## Example 7.8
+
+### Load data
+
+```{r}
+unemployment <- 
+  read_excel("data/J06.xlsx", skip = 1) |> 
+  mutate(
+    year_quarter = make_yearquarter(
+      as.numeric(str_sub(`Y/Q`, 1, 4)), 
+      as.numeric(str_sub(`Y/Q`, 6, 6))
+    )
+  ) |> 
+  select(year_quarter, rate) |> 
+  as_tsibble(index = year_quarter) |> 
+  mutate(t = row_number())
+```
+
+```{r}
+unemployment |> 
+  autoplot(rate)
+```
+
+### Sample spectrum
+
+```{r}
+n <- nrow(unemployment)
+
+sample_spectrum <- 
+  unemployment |> 
+  mutate(
+    k = row_number() - 1,
+    w = 2 * pi * k / n
+  ) |> 
+  filter(between(k, 1, n / 2)) |> 
+  rowwise() |> 
+  mutate(
+    a = 1 / sqrt(n) * sum(unemployment$rate * cos(unemployment$t * w)),
+    b = 1 / sqrt(n) * sum(unemployment$rate * sin(unemployment$t * w)),
+    I = a^2 + b^2,
+    f = I / (2 * pi)
+  ) |> 
+  ungroup()
+  
+sample_spectrum |> 
+  ggplot(aes(x = w, y = f)) +
+  geom_line() + 
+  geom_point() + 
+  labs(
+    title = "Periodogram / 2pi",
+    y = NULL,
+    x = "Frequency (w)"
+  )
+```
+
+Frequency associated with the maximum periodogram:
+
+```{r}
+w_peak <- 
+  sample_spectrum |> 
+  slice_max(f, n = 1) |> 
+  pull(w)
+
+w_peak
+```
+
+Seasonal period
+
+```{r}
+period <- 2 * pi / w_peak
+period
+```
+
+
+## Example 7.11
+
+### Load data
+
+```{r}
+car_accident_mortality <- 
+  read_excel(
+    "data/J12.xlsx",
+    skip = 1,
+    col_names = c("year_month", "deaths")
+  ) |> 
+  mutate(year_month = yearmonth(year_month)) |> 
+  as_tsibble(index = year_month) |> 
+  mutate(t = row_number())
+```
+
+
+```{r}
+car_accident_mortality |> 
+  autoplot(deaths)
+```
+
+
+### Sample spectrum
+
+```{r}
+n <- nrow(car_accident_mortality)
+
+sample_spectrum <- 
+  car_accident_mortality |> 
+  mutate(
+    k = row_number() - 1,
+    w = 2 * pi * k / n
+  ) |> 
+  filter(between(k, 1, n / 2)) |> 
+  rowwise() |> 
+  mutate(
+    a = 1 / sqrt(n) * sum(car_accident_mortality$deaths * cos(car_accident_mortality$t * w)),
+    b = 1 / sqrt(n) * sum(car_accident_mortality$deaths * sin(car_accident_mortality$t * w)),
+    I = a^2 + b^2,
+    f = I / (2 * pi)
+  ) |> 
+  ungroup()
+  
+sample_spectrum |> 
+  ggplot(aes(x = w, y = f)) +
+  geom_line() + 
+  geom_point() + 
+  labs(
+    title = "Periodogram / 2pi",
+    y = NULL,
+    x = "Frequency (w)"
+  )
+```
+
+
+### Periodogram smoothing
+
+```{r}
+sample_spectrum_smoothing <- 
+  sample_spectrum |> 
+  mutate(
+    I_tilde = slider::slide_dbl(
+      I, 
+      weighted.mean, 
+      w = c(1, 2, 3, 3, 3, 2, 1), 
+      .before = 3, 
+      .after = 3,
+      .complete = TRUE),
+    f_tilde = I_tilde / (2 * pi)
+  )
+
+sample_spectrum_smoothing |> 
+  ggplot(aes(x = w, y = f_tilde)) +
+  geom_line() + 
+  geom_point() + 
+  labs(
+    title = "Smoothed periodogram / 2pi",
+    y = NULL,
+    x = "Frequency (w)"
+  )
+```

@@ -13,6 +13,7 @@ book:
     - ch04_arma_estimation.qmd
     - ch05_arma_forecast.qmd
     - ch06_arima.qmd
+    - ch07_spectral_analysis.qmd
   repo-url: https://github.com/youngroklee-ml/time-series-book-examples
 
 format:
