@@ -14,6 +14,7 @@ book:
     - ch05_arma_forecast.qmd
     - ch06_arima.qmd
     - ch07_spectral_analysis.qmd
+    - ch08_outlier_detection.qmd
   repo-url: https://github.com/youngroklee-ml/time-series-book-examples
 
 format:

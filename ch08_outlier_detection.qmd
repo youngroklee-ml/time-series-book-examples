@@ -1,0 +1,57 @@
+# Outlier detection
+
+```{r}
+library(tidyverse)
+library(tsibble) # time series data frame wrangling
+library(fable)   # forecasting models
+library(feasts)  # feature extraction, statistics, visualization for time series data
+library(readxl)
+```
+
+
+## Example 8.3
+
+### Data
+
+```{r}
+ts <- 
+  tsibble(
+    t = seq_len(10),
+    value = c(-0.17, 0.24, -0.51, 1.10, 0.08, 0.32, -0.44, -1.16, -0.58, -0.28),
+    index = t
+  )
+```
+
+### Outlier detection with AR(1) model
+
+Assume the following AR(1) model:
+
+$$
+y_t = 0.2 y_{t-1} + \varepsilon_t,  \sigma_{\varepsilon}^2 = 1
+$$
+
+Residual:
+
+```{r}
+ts_residual <- 
+  ts |> 
+  mutate(
+    fitted = coalesce(0.2 * lag(value), value),
+    residual = value - fitted
+  )
+
+ts_residual
+```
+
+AO and IO coefficients and test statistics:
+
+```{r}
+ts_residual |> 
+  mutate(
+    w_ao = (residual - 0.2 * lead(residual)) / (1 + 0.2^2),
+    w_io = residual,
+    lambda_ao = w_ao * sqrt(1 + 0.2^2) / 1,
+    lambda_io = w_io / 1
+  )
+```
+
