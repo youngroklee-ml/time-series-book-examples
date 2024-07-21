@@ -278,5 +278,25 @@
     "crumbs": [
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Spectral analysis</span>"
     ]
+  },
+  {
+    "objectID": "ch08_outlier_detection.html",
+    "href": "ch08_outlier_detection.html",
+    "title": "8  Outlier detection",
+    "section": "",
+    "text": "8.1 Example 8.3",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Outlier detection</span>"
+    ]
+  },
+  {
+    "objectID": "ch08_outlier_detection.html#example-8.3",
+    "href": "ch08_outlier_detection.html#example-8.3",
+    "title": "8  Outlier detection",
+    "section": "",
+    "text": "8.1.1 Data\n\nts &lt;- \n  tsibble(\n    t = seq_len(10),\n    value = c(-0.17, 0.24, -0.51, 1.10, 0.08, 0.32, -0.44, -1.16, -0.58, -0.28),\n    index = t\n  )\n\n\n\n8.1.2 Outlier detection with AR(1) model\nAssume the following AR(1) model:\n\\[\ny_t = 0.2 y_{t-1} + \\varepsilon_t,  \\sigma_{\\varepsilon}^2 = 1\n\\]\nResidual:\n\nts_residual &lt;- \n  ts |&gt; \n  mutate(\n    fitted = coalesce(0.2 * lag(value), value),\n    residual = value - fitted\n  )\n\nts_residual\n\n# A tsibble: 10 x 4 [1]\n       t value fitted residual\n   &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;\n 1     1 -0.17 -0.17     0    \n 2     2  0.24 -0.034    0.274\n 3     3 -0.51  0.048   -0.558\n 4     4  1.1  -0.102    1.20 \n 5     5  0.08  0.22    -0.14 \n 6     6  0.32  0.016    0.304\n 7     7 -0.44  0.064   -0.504\n 8     8 -1.16 -0.088   -1.07 \n 9     9 -0.58 -0.232   -0.348\n10    10 -0.28 -0.116   -0.164\n\n\nAO and IO coefficients and test statistics:\n\nts_residual |&gt; \n  mutate(\n    w_ao = (residual - 0.2 * lead(residual)) / (1 + 0.2^2),\n    w_io = residual,\n    lambda_ao = w_ao * sqrt(1 + 0.2^2) / 1,\n    lambda_io = w_io / 1\n  )\n\n# A tsibble: 10 x 8 [1]\n       t value fitted residual    w_ao   w_io lambda_ao lambda_io\n   &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n 1     1 -0.17 -0.17     0     -0.0527  0       -0.0537     0    \n 2     2  0.24 -0.034    0.274  0.371   0.274    0.378      0.274\n 3     3 -0.51  0.048   -0.558 -0.768  -0.558   -0.783     -0.558\n 4     4  1.1  -0.102    1.20   1.18    1.20     1.21       1.20 \n 5     5  0.08  0.22    -0.14  -0.193  -0.14    -0.197     -0.14 \n 6     6  0.32  0.016    0.304  0.389   0.304    0.397      0.304\n 7     7 -0.44  0.064   -0.504 -0.278  -0.504   -0.284     -0.504\n 8     8 -1.16 -0.088   -1.07  -0.964  -1.07    -0.983     -1.07 \n 9     9 -0.58 -0.232   -0.348 -0.303  -0.348   -0.309     -0.348\n10    10 -0.28 -0.116   -0.164 NA      -0.164   NA         -0.164",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Outlier detection</span>"
+    ]
   }
 ]
