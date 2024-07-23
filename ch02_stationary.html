@@ -491,21 +491,14 @@ Partial autocorrelations of series 'earthquake$numbers', by lag
 <p>Visualize partial autocorrelation function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>earthquake <span class="sc">|&gt;</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 10 x 2 [1Y]
-        lag     pacf
-   &lt;cf_lag&gt;    &lt;dbl&gt;
- 1       1Y  0.395  
- 2       2Y  0.184  
- 3       3Y  0.113  
- 4       4Y  0.0607 
- 5       5Y -0.00445
- 6       6Y -0.0469 
- 7       7Y  0.110  
- 8       8Y -0.0358 
- 9       9Y -0.210  
-10      10Y -0.0610 </code></pre>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PACF</span>(numbers, <span class="at">lag_max =</span> K) <span class="sc">|&gt;</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ch02_stationary_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 
