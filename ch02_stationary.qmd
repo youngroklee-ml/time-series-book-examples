@@ -133,5 +133,6 @@ Visualize partial autocorrelation function.
 
 ```{r}
 earthquake |> 
-  PACF(numbers, lag_max = K)
+  PACF(numbers, lag_max = K) |> 
+  autoplot()
 ```
